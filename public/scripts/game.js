@@ -23,7 +23,7 @@ function game() {
         left: false
     }
 
-    socket.on('player', (user, characters2) => {
+    socket.on('player', (user, characters2) => { //kolla på det här sen
         screens.forEach((s1) => {
             if (s1.number === user.screen) {
                 s1.active = true
@@ -52,9 +52,10 @@ function game() {
         screen.characters.splice(screen.characters.indexOf(screen.characters.find((c) => { return c.username === username })), 1)
     })
 
-    socket.on('position', (user) => {
+    socket.on('position', (user) => { //ändra andras position
+        console.log(user.screen);
         screens[user.screen].characters.forEach(c => {
-            console.log(user.username + " : " + c.username);
+            console.log(c.username);
             if (user.username === c.username) {
                 c.updatePosition(user.pos)
             }
@@ -66,11 +67,15 @@ function game() {
             if (s1.number === s) {
                 s1.active = false
                 s1.characters.splice(s1.characters.indexOf(s1.characters.find((u1) => { return u1.username === u })))
-            } else if (s1.number === newS) {
-                s1.active = true
-                s1.characters.push()
-            }
+                console.log("-----------------");
+                console.log(s1.characters);
+            } 
         })
+        let newScreen = screens.find(s => {return s.number === newS})
+        let user = newScreen.characters.find(u => {return u.username === u})
+        newScreen.characters.push(user)
+        newScreen.active = false
+        screens.find(s => {return s.number === newS}) = newScreen
     })
 
     let previous_timestamp
@@ -160,7 +165,8 @@ function game() {
                     screen.active = false
                     console.log('n: ' + n);
                     let newScreen = screens.find((s) => { return s.number === n })
-                    socket.emit("change_screen", (screen.number, newScreen.number))
+                    console.log(newScreen.number);
+                    socket.emit("change_screen", screen.number, newScreen.number)
                     screens[screens.indexOf(newScreen)].active = true
                     screen = getActiveScreen()
                 }

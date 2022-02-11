@@ -92,7 +92,7 @@ io.on('connection', (socket) => {
         online_users.push(socket.user)
 
         //----page----
-        socket.emit("active_users", online_users)
+        socket.emit("active_users", online_users.map(u => {return u.username})) //skicka enbart användarnamnen
         //console.log("------online_users------")
         //console.log(online_users)
         socket.broadcast.emit("user_connected", socket.user.username)
@@ -104,7 +104,7 @@ io.on('connection', (socket) => {
         let characters = [] //lista med alla aktiva karaktärer
         io.sockets.sockets.forEach(socket => {
             console.log("hej");
-            if (socket.user.username) { //ibland skapas en extra socket vid connection, inte bra
+            if (socket.user) { //ibland skapas en extra socket vid connection, inte bra
                 let character = {
                     username: socket.user.username, 
                     pos: socket.user.pos,
@@ -133,14 +133,15 @@ io.on('connection', (socket) => {
         console.log('pong');
     })
 
-    socket.on('position', (pos) => {
+    socket.on('position', (pos) => { //uppdatera position och skicka till andra
         socket.user.pos = pos
-        //console.log(socket.username)
-        socket.broadcast.emit('position', user)
+        //console.log(socket.user.username)
+        socket.broadcast.emit('position', socket.user)
     })
 
-    socket.on('change_screen', (screen, newScreen) => {
+    socket.on('change_screen', (screen, newScreen) => { //uppdatera skärm och skicka till andra
         socket.user.screen = newScreen
+        //console.log(socket.user.screen + " screeeeen");
         socket.broadcast.emit('change_screen', screen, newScreen, socket.user.username)
     }) 
 })

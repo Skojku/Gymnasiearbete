@@ -6,7 +6,7 @@ class Screen {
         this.characters = []
         this.active = active
         nextScreens.forEach((n, i) => {
-            if (n === 0) {
+            if (n === -1) {
                 switch (i) {
                     case 0:
                         this.obstacles.push(new Obstacle(5, 500, -5, 0, ctx, "border"))
