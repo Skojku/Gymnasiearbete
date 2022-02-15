@@ -121,16 +121,16 @@ io.on('connection', (socket) => {
     }
 
     socket.on('disconnect', (reason) => {
-        online_users.splice(online_users.indexOf(socket.username), 1)
+        online_users.splice(online_users.indexOf(socket.user), 1)
         console.log('a user disconnected because of ' + reason)
         console.log("------online_users------")
         console.log(online_users)
-        io.emit("active_users", online_users)
-        io.emit("remove_character", socket.username)
+        io.emit("active_users", online_users.map(u => {return u.username}))
+        io.emit("remove_character", socket.user.username)
     })
 
     socket.on("pong", () => {
-        console.log('pong');
+        console.log('pong')
     })
 
     socket.on('position', (pos) => { //uppdatera position och skicka till andra
@@ -141,7 +141,7 @@ io.on('connection', (socket) => {
 
     socket.on('change_screen', (screen, newScreen) => { //uppdatera skärm och skicka till andra
         socket.user.screen = newScreen
-        //console.log(socket.user.screen + " screeeeen");
+        //console.log(socket.user.username + " screeeeen");
         socket.broadcast.emit('change_screen', screen, newScreen, socket.user.username)
     }) 
 })

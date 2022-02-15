@@ -28,10 +28,10 @@ function game() {
             if (s1.number === user.screen) {
                 s1.active = true
                 screen = s1
-                console.log("screen: " + screen.number);
+                //console.log("screen: " + screen.number);
             }
         })
-        console.log(characters2);
+        //console.log(characters2);
         characters2.forEach(c => {
             if (user.username === c.username) {
                 player = new Character(50, 50, user.pos[0], user.pos[1], ctx, 'green', user.username)
@@ -53,9 +53,8 @@ function game() {
     })
 
     socket.on('position', (user) => { //ändra andras position
-        console.log(user.screen);
+        //console.log(screens[user.screen]);
         screens[user.screen].characters.forEach(c => {
-            console.log(c.username);
             if (user.username === c.username) {
                 c.updatePosition(user.pos)
             }
@@ -63,19 +62,22 @@ function game() {
     })
 
     socket.on('change_screen', (s, newS, u) => {
+        let user;
         screens.forEach(s1 => {
             if (s1.number === s) {
-                s1.active = false
-                s1.characters.splice(s1.characters.indexOf(s1.characters.find((u1) => { return u1.username === u })))
-                console.log("-----------------");
-                console.log(s1.characters);
+                user = s1.characters.splice(s1.characters.indexOf(s1.characters.find((u1) => { return u1.username === u })), 1)[0]
+                //console.log("-----------------");
+                //console.log(user);
+                //console.log(s1.characters);
             } 
         })
-        let newScreen = screens.find(s => {return s.number === newS})
-        let user = newScreen.characters.find(u => {return u.username === u})
-        newScreen.characters.push(user)
-        newScreen.active = false
-        screens.find(s => {return s.number === newS}) = newScreen
+        screens.forEach(s1 => {
+            if (s1.number === newS) {
+                //console.log('u: ' + u);
+                //console.log(user.username + " -----------");
+                s1.characters.push(user)
+            }
+        })
     })
 
     let previous_timestamp
@@ -165,7 +167,6 @@ function game() {
                     screen.active = false
                     console.log('n: ' + n);
                     let newScreen = screens.find((s) => { return s.number === n })
-                    console.log(newScreen.number);
                     socket.emit("change_screen", screen.number, newScreen.number)
                     screens[screens.indexOf(newScreen)].active = true
                     screen = getActiveScreen()
