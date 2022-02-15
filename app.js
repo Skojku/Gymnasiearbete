@@ -10,7 +10,10 @@ var users = require('./hardcoded_database')
 var online_users = []
 
 // --------TODO---------
-// he he he ha
+// world editor
+// bättre kollision
+// fixa items och inventory
+// fixa sprite
 
 var req1
 
