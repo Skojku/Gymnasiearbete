@@ -221,9 +221,4 @@ function game() {
                 break
         }
     })
-
-    var editor = document.getElementById("editor")
-    var ctx2 = editor.getContext("2d")
-    editor.height = 500
-    editor.width = 500
 }

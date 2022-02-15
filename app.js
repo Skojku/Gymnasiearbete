@@ -43,6 +43,14 @@ app.get('/game', (req, res) => {
     }
 })
 
+app.get('/editor', (req, res) => {
+    if (req.session.loggedIn) {
+        res.sendFile(__dirname + '/public/html/editor.html')
+    } else {
+        res.redirect('/')
+    }
+})
+
 app.get('/user', (req, res) => {
     if (req.session.loggedIn) {
         //console.log(req.session.username)
@@ -53,7 +61,6 @@ app.get('/user', (req, res) => {
 })
 
 app.post('/logout', (req, res) => {
-    console.log('@@@@@@@@@@@@@@@@@@@@@@@')
     req.session.destroy()
     res.send()
     //res.redirect('/')
@@ -72,7 +79,11 @@ app.post('/login', (req, res) => {
             req1.session.username = user.username
             req.session.loggedIn = true
             login = true
-            res.redirect('/game')
+            if (user.editor === "on") {
+                res.redirect('/editor')
+            } else {
+                res.redirect('/game')
+            }
         }
     })
     if (!login) {
@@ -87,7 +98,7 @@ io.on('connection', (socket) => {
     if (req1) {
         user = {
             username: req1.session.username,
-            pos: [200,100],
+            pos: [200, 100],
             screen: 0
         }
         socket.user = user
@@ -95,7 +106,7 @@ io.on('connection', (socket) => {
         online_users.push(socket.user)
 
         //----page----
-        socket.emit("active_users", online_users.map(u => {return u.username})) //skicka enbart användarnamnen
+        socket.emit("active_users", online_users.map(u => { return u.username })) //skicka enbart användarnamnen
         //console.log("------online_users------")
         //console.log(online_users)
         socket.broadcast.emit("user_connected", socket.user.username)
@@ -109,7 +120,7 @@ io.on('connection', (socket) => {
             console.log("hej");
             if (socket.user) { //ibland skapas en extra socket vid connection, inte bra
                 let character = {
-                    username: socket.user.username, 
+                    username: socket.user.username,
                     pos: socket.user.pos,
                     screen: socket.user.screen
                 }
@@ -128,7 +139,7 @@ io.on('connection', (socket) => {
         console.log('a user disconnected because of ' + reason)
         console.log("------online_users------")
         console.log(online_users)
-        io.emit("active_users", online_users.map(u => {return u.username}))
+        io.emit("active_users", online_users.map(u => { return u.username }))
         io.emit("remove_character", socket.user.username)
     })
 
@@ -146,7 +157,7 @@ io.on('connection', (socket) => {
         socket.user.screen = newScreen
         //console.log(socket.user.username + " screeeeen");
         socket.broadcast.emit('change_screen', screen, newScreen, socket.user.username)
-    }) 
+    })
 })
 
 server.listen(8080, () => {
