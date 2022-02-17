@@ -5,6 +5,7 @@ const server = http.createServer(app)
 const { Server } = require('socket.io')
 const io = new Server(server)
 const session = require('express-session')
+const fs = require('fs')
 
 var users = require('./hardcoded_database')
 var online_users = []
@@ -13,12 +14,13 @@ var online_users = []
 // world editor
 // bättre kollision
 // fixa items och inventory
-// fixa sprite
+// fixa sprites
 
 var req1
 
 app.use(express.static('./public'))
 app.use(express.urlencoded({ extended: false }))
+app.use(express.json())
 app.use(session({
     secret: "aaaaaaaaaaaaa",
     resave: true,
@@ -58,6 +60,16 @@ app.get('/user', (req, res) => {
     } else {
         res.redirect('/')
     }
+})
+
+app.post('/update_world', (req, res) => {
+    console.log(req.body)
+    fs.writeFile('world_file.json', JSON.stringify(req.body), { flag: 'a' }, err => {
+        if (err) {
+            console.error(err)
+            return
+        }
+    })
 })
 
 app.post('/logout', (req, res) => {
