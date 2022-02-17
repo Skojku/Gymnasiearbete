@@ -5,21 +5,28 @@ $(() => {
     const screen = new Screen(0, [-1, -1, -1, -1], false)
     var selected_item = $("#select_obstacle").val()
 
-    //rita grid
-    ctx.beginPath()
-    for (let i = 50; i < 500; i += 50) {
-        ctx.moveTo(i, 0)
-        ctx.lineTo(i, canvas.height)
+    $.get("/world_file", ((data) => {
+        console.log(data);
+        }), "application/json"
+    )
+
+    drawGrid()
+    function drawGrid() {
+        ctx.beginPath()
+        for (let i = 50; i < 500; i += 50) {
+            ctx.moveTo(i, 0)
+            ctx.lineTo(i, canvas.height)
+        }
+        for (let i = 50; i < 500; i += 50) {
+            ctx.moveTo(0, i)
+            ctx.lineTo(canvas.width, i)
+        }
+        ctx.stroke()
     }
-    for (let i = 50; i < 500; i += 50) {
-        ctx.moveTo(0, i)
-        ctx.lineTo(canvas.width, i)
-    }
-    ctx.stroke()
 
     //om klick
-    $("#canvas").mouseup((e) => {
-        console.log("klick");
+    $("#canvas").mousedown((e) => {
+        console.log("klick")
         const rect = canvas.getBoundingClientRect()
         const x = e.clientX - rect.left
         const y = e.clientY - rect.top
@@ -39,16 +46,37 @@ $(() => {
     })
 
     $("#submit").click(() => {
-        console.log('klick');
+        console.log('klick')
+        screen.number = $("#number").val()
+        screen.nextScreens = [$("#next1").val(), $("#next2").val(), $("#next3").val(), $("#next4").val()]
+        console.log(screen);
         $.ajax({
             type: "POST",
             url: "/update_world",
             data: JSON.stringify(screen),
             contentType: 'application/json; charset=utf-8',
-            dataType: "json",
-            success: (res) => {
-                console.log("ayo");
-            }
+            dataType: "json"
         })
+    })
+
+    //clear canvas
+    $("#clearC").click(() => {
+        screen.removeObstacles()
+        ctx.clearRect(0, 0, canvas.width, canvas.height) //clear canvas
+        screen.draw()
+        drawGrid()
+    })
+
+    //clear everything
+    $("#clearE").click(() => {
+        $("#next1").val(-1)
+        $("#next2").val(-1)
+        $("#next3").val(-1)
+        $("#next4").val(-1)
+        $("#number").val(0)
+        screen.removeObstacles()
+        ctx.clearRect(0, 0, canvas.width, canvas.height) //clear canvas
+        screen.draw()
+        drawGrid()
     })
 })

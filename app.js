@@ -46,6 +46,17 @@ app.get('/game', (req, res) => {
     }
 })
 
+app.get('/world_file', (req, res) => {
+    fs.readFile('world_file.json', (err, data) => {
+        if (err) {
+            console.error(err)
+            return
+        }
+        res.setHeader('Content-Type', 'application/json')
+        res.send(JSON.parse(data))
+    })
+})
+
 app.get('/editor', (req, res) => {
     if (req.session.loggedIn) {
         res.sendFile(__dirname + '/public/html/editor.html')

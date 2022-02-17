@@ -35,6 +35,14 @@ class Screen {
         this.characters.push(c)
     }
 
+    removeObstacles() {
+        this.obstacles.forEach(o => {
+            if (o.type !== "border") {
+                this.obstacles.splice(this.obstacles.indexOf(o))
+            }
+        })
+    }
+
     draw() {
         this.obstacles.forEach((o) => {
             o.draw()
