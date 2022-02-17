@@ -1,5 +1,5 @@
 class Screen {
-    constructor(number, nextScreens, active, ctx) {
+    constructor(number, nextScreens, active) {
         this.number = number
         this.nextScreens = nextScreens
         this.obstacles = []
@@ -9,16 +9,16 @@ class Screen {
             if (n === -1) {
                 switch (i) {
                     case 0:
-                        this.obstacles.push(new Obstacle(5, 500, -5, 0, ctx, "border"))
+                        this.obstacles.push(new Obstacle(5, 500, -5, 0, "border"))
                         break;
                     case 1:
-                        this.obstacles.push(new Obstacle(500, 5, 0, -5, ctx, "border"))
+                        this.obstacles.push(new Obstacle(500, 5, 0, -5, "border"))
                         break;
                     case 2:
-                        this.obstacles.push(new Obstacle(5, 500, 500, 0, ctx, "border"))
+                        this.obstacles.push(new Obstacle(5, 500, 500, 0, "border"))
                         break;
                     case 3:
-                        this.obstacles.push(new Obstacle(500, 5, 0, 500, ctx, "border"))
+                        this.obstacles.push(new Obstacle(500, 5, 0, 500, "border"))
                         break;
                     default:
                         break;

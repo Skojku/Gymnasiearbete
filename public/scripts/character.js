@@ -1,6 +1,6 @@
 class Character extends Collision_base {
-    constructor(height, width, x, y, ctx, color, username) {
-        super(height, width, x, y, ctx)
+    constructor(height, width, x, y, color, username) {
+        super(height, width, x, y)
         this.color = color
         this.username = username
         this.newX = x
@@ -31,10 +31,10 @@ class Character extends Collision_base {
     }
 
     draw() {
-        this.ctx.fillStyle = this.color
-        this.ctx.font = "20px Comic Sans MS"
+        ctx.fillStyle = this.color
+        ctx.font = "20px Comic Sans MS"
         let x = (this.username.length*10)/2
-        this.ctx.fillText(this.username, this.x-x+(this.width/2), this.y-2)
-        this.ctx.fillRect(this.x, this.y, this.width, this.height)
+        ctx.fillText(this.username, this.x-x+(this.width/2), this.y-2)
+        ctx.fillRect(this.x, this.y, this.width, this.height)
     }
 }

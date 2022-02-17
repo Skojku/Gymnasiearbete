@@ -1,19 +1,19 @@
 class Obstacle extends Collision_base {
-    constructor(width, height, x, y, ctx, type) {
-        super(height, width, x, y, ctx)
+    constructor(width, height, x, y, type) {
+        super(height, width, x, y)
         this.type = type
     }
 
     draw() {
         if (this.type == "bush") {
-            this.ctx.fillStyle = '#047015'
+            ctx.fillStyle = '#047015'
         } else if (this.type == "stone") {
-            this.ctx.fillStyle = '#61636b'
+            ctx.fillStyle = '#61636b'
         } else if (this.type == "tree") {
-            this.ctx.fillStyle = '#15ed61'
+            ctx.fillStyle = '#15ed61'
         } else if (this.type == "border") {
-            this.ctx.fillStyle = 'red'
+            ctx.fillStyle = 'red'
         }
-        this.ctx.fillRect(this.x,this.y,this.width,this.height)
+        ctx.fillRect(this.x,this.y,this.width,this.height)
     }
 }

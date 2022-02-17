@@ -1,7 +1,4 @@
 function game() {
-
-    var canvas = document.getElementById("canvas")
-    var ctx = canvas.getContext("2d")
     var speed = 200
     canvas.height = 500
     canvas.width = 500
@@ -9,11 +6,11 @@ function game() {
     var player
 
     var screens = []
-    screens[0] = new Screen(0, [1, -1, -1, -1], false, ctx)
-    screens[0].obstacles.push(new Obstacle(50, 50, 300, 300, ctx, "tree"))
-    screens[0].obstacles.push(new Obstacle(50, 50, 195, 300, ctx, "bush"))
-    screens[1] = new Screen(1, [-1, -1, 0, -1], false, ctx)
-    screens[1].obstacles.push(new Obstacle(50, 50, 100, 100, ctx, "stone"))
+    screens[0] = new Screen(0, [1, -1, -1, -1], false)
+    screens[0].obstacles.push(new Obstacle(50, 50, 300, 300, "tree"))
+    screens[0].obstacles.push(new Obstacle(50, 50, 195, 300, "bush"))
+    screens[1] = new Screen(1, [-1, -1, 0, -1], false)
+    screens[1].obstacles.push(new Obstacle(50, 50, 100, 100, "stone"))
     var screen
 
     var keys = {
@@ -34,9 +31,9 @@ function game() {
         //console.log(characters2);
         characters2.forEach(c => {
             if (user.username === c.username) {
-                player = new Character(50, 50, user.pos[0], user.pos[1], ctx, 'green', user.username)
+                player = new Character(50, 50, user.pos[0], user.pos[1], 'green', user.username)
             } else {
-                let newCharacter = new Character(50, 50, c.pos[0], c.pos[1], ctx, 'blue', c.username)
+                let newCharacter = new Character(50, 50, c.pos[0], c.pos[1], 'blue', c.username)
                 newCharacter.draw()
                 screens[c.screen].characters.push(newCharacter)
             }
@@ -44,8 +41,8 @@ function game() {
     })
 
     socket.on('new_character', (user) => {
-        //screens.find((s1) => { return s1.number === s }).characters.push(new Character(50, 50, pos[0], pos[1], ctx, 'green', username))
-        screens[user.screen].characters.push(new Character(50, 50, user.pos[0], user.pos[1], ctx, 'blue', user.username))
+        //screens.find((s1) => { return s1.number === s }).characters.push(new Character(50, 50, pos[0], pos[1], 'green', username))
+        screens[user.screen].characters.push(new Character(50, 50, user.pos[0], user.pos[1], 'blue', user.username))
     })
 
     socket.on('remove_character', (username) => {

@@ -5,6 +5,7 @@ const server = http.createServer(app)
 const { Server } = require('socket.io')
 const io = new Server(server)
 const session = require('express-session')
+
 const fs = require('fs')
 
 var users = require('./hardcoded_database')
@@ -53,6 +54,19 @@ app.get('/editor', (req, res) => {
     }
 })
 
+app.post('/update_world', (req, res) => {
+    fs.readFile('world_file.json', (err, data) => {
+        var json = JSON.parse(data)
+        json.push(req.body)
+        fs.writeFile("world_file.json", JSON.stringify(json, null, 4), err => {
+            if (err) {
+                console.error(err)
+                return
+            }
+        })
+    })
+})
+
 app.get('/user', (req, res) => {
     if (req.session.loggedIn) {
         //console.log(req.session.username)
@@ -60,16 +74,6 @@ app.get('/user', (req, res) => {
     } else {
         res.redirect('/')
     }
-})
-
-app.post('/update_world', (req, res) => {
-    console.log(req.body)
-    fs.writeFile('world_file.json', JSON.stringify(req.body), { flag: 'a' }, err => {
-        if (err) {
-            console.error(err)
-            return
-        }
-    })
 })
 
 app.post('/logout', (req, res) => {

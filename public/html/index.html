@@ -36,23 +36,10 @@
         </div>
     </div>
 
-    <div id="editor_div" class="container">
-        <div class="row">
-            <div class="col">
-                <canvas id="editor" ></canvas>
-            </div>
-            <div class="col">
-                <select id="select_obstacle" class="form-select w-50">
-                    <option selected>Choose obstacle</option>
-                    <option value="bush">Bush</option>
-                    <option value="stone">Stone</option>
-                    <option value="tree">Tree</option>
-                </select>
-            </div>
-        </div>
-    </div>
     <script src="/socket.io/socket.io.js"></script>
     <script>
+        const canvas = document.getElementById("canvas")
+        const ctx = canvas.getContext("2d")
         var socket
         var username
         let promise = new Promise((resolve) => {

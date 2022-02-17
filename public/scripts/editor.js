@@ -1,10 +1,8 @@
 $(() => {
-    const canvas = document.getElementById("canvas")
-    const ctx = canvas.getContext("2d")
     canvas.height = 500
     canvas.width = 500
 
-    const screen = new Screen(0, [-1, -1, -1, -1], true, ctx)
+    const screen = new Screen(0, [-1, -1, -1, -1], false)
     var selected_item = $("#select_obstacle").val()
 
     //rita grid
@@ -31,7 +29,7 @@ $(() => {
         console.log(i + " , " + j)
 
         if (selected_item !== "first") {
-            screen.addObstacle(new Obstacle(50, 50, i * 50, j * 50, ctx, selected_item))
+            screen.addObstacle(new Obstacle(50, 50, i * 50, j * 50, selected_item))
             screen.draw()
         }
     })
@@ -41,7 +39,16 @@ $(() => {
     })
 
     $("#submit").click(() => {
-        console.log(JSON.stringify(screen))
-        $.post("/update_world", JSON.stringify(screen))
+        console.log('klick');
+        $.ajax({
+            type: "POST",
+            url: "/update_world",
+            data: JSON.stringify(screen),
+            contentType: 'application/json; charset=utf-8',
+            dataType: "json",
+            success: (res) => {
+                console.log("ayo");
+            }
+        })
     })
 })
