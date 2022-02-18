@@ -12,6 +12,7 @@ $(() => {
             screens.push(Screen.from(s))
             $("#edit_screen").append(`<option value="${s.number}">${s.number}</option>`)
         })
+        console.log(screens);
     })
 
 
@@ -52,8 +53,8 @@ $(() => {
 
     $("#edit_screen").change(() => {
         console.log('---------------');
-        console.log(screens);
-        screen = screens.find(s => {return $("#edit_screen").val() === s.number}) //selected_screen
+        console.log(screens[0].obstacles);
+        screen = screens.find(s => {return parseInt($("#edit_screen").val()) === s.number}) //selected_screen
         console.log('-------------');
         console.log(screen);
         $("#next1").val(screen.nextScreens[0])
@@ -61,13 +62,15 @@ $(() => {
         $("#next3").val(screen.nextScreens[2])
         $("#next4").val(screen.nextScreens[3])
         $("#number").val(screen.number)
-        clear_canvas()
+        ctx.clearRect(0, 0, canvas.width, canvas.height) //clear canvas
+        drawGrid()
+        screen.draw()
     })
 
     $("#submit").click(() => {
         console.log('klick')
-        screen.number = $("#number").val()
-        screen.nextScreens = [$("#next1").val(), $("#next2").val(), $("#next3").val(), $("#next4").val()]
+        screen.number = parseInt($("#number").val())
+        screen.nextScreens = [parseInt($("#next1").val()), parseInt($("#next2").val()), parseInt($("#next3").val()), parseInt($("#next4").val())]
         console.log(screen);
         $.ajax({
             type: "POST",

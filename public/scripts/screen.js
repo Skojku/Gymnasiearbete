@@ -54,13 +54,15 @@ class Screen {
 
     //läs från json-fil
     static from(json) {
-        console.log(json);
-        console.log(JSON.stringify(json, null, 4))
+        //console.log(json);
         let s = new Screen(json.number, json.nextScreens, json.active)
+        console.log(json.obstacles);
         json.obstacles.forEach(o => {
             s.obstacles.push(new Obstacle(o.width, o.height, o.x, o.y, o.type))
         })
         s.characters = []
+        console.log('sssssssssss');
+        console.log(s);
         return s
     }
 }

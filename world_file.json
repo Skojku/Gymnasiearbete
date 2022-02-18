@@ -1,11 +1,80 @@
 [
     {
-        "number": "0",
+        "number": 4,
         "nextScreens": [
-            "-1",
-            "-1",
-            "1",
-            "-1"
+            1,
+            1,
+            1,
+            1
+        ],
+        "obstacles": [
+            {
+                "height": 50,
+                "width": 50,
+                "x": 150,
+                "y": 200,
+                "type": "bush"
+            },
+            {
+                "height": 50,
+                "width": 50,
+                "x": 200,
+                "y": 150,
+                "type": "bush"
+            },
+            {
+                "height": 50,
+                "width": 50,
+                "x": 250,
+                "y": 200,
+                "type": "bush"
+            },
+            {
+                "height": 50,
+                "width": 50,
+                "x": 200,
+                "y": 250,
+                "type": "bush"
+            },
+            {
+                "height": 500,
+                "width": 5,
+                "x": -5,
+                "y": 0,
+                "type": "border"
+            },
+            {
+                "height": 5,
+                "width": 500,
+                "x": 0,
+                "y": -5,
+                "type": "border"
+            },
+            {
+                "height": 500,
+                "width": 5,
+                "x": 500,
+                "y": 0,
+                "type": "border"
+            },
+            {
+                "height": 5,
+                "width": 500,
+                "x": 0,
+                "y": 500,
+                "type": "border"
+            }
+        ],
+        "characters": [],
+        "active": false
+    },
+    {
+        "number": 1,
+        "nextScreens": [
+            1,
+            -1,
+            -1,
+            -1
         ],
         "obstacles": [
             {
@@ -40,197 +109,43 @@
                 "height": 50,
                 "width": 50,
                 "x": 350,
+                "y": 100,
+                "type": "tree"
+            },
+            {
+                "height": 50,
+                "width": 50,
+                "x": 250,
                 "y": 150,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 250,
-                "y": 200,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 150,
-                "y": 200,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 50,
-                "y": 250,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 0,
-                "y": 200,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 50,
-                "y": 100,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 200,
-                "y": 50,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 250,
-                "y": 100,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 300,
-                "y": 250,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 200,
-                "y": 400,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 150,
-                "y": 400,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 350,
-                "y": 450,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 400,
-                "y": 450,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 450,
-                "y": 400,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 450,
-                "y": 350,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 450,
-                "y": 300,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 450,
-                "y": 250,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 450,
-                "y": 200,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 450,
-                "y": 150,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 450,
-                "y": 100,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 450,
-                "y": 50,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 400,
-                "y": 0,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 300,
-                "y": 0,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 350,
-                "y": 0,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 200,
-                "y": 0,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 250,
-                "y": 0,
-                "type": "stone"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 150,
-                "y": 0,
-                "type": "stone"
+                "type": "tree"
             },
             {
                 "height": 50,
                 "width": 50,
                 "x": 100,
-                "y": 0,
-                "type": "stone"
+                "y": 250,
+                "type": "tree"
+            },
+            {
+                "height": 50,
+                "width": 50,
+                "x": 300,
+                "y": 300,
+                "type": "bush"
+            },
+            {
+                "height": 50,
+                "width": 50,
+                "x": 250,
+                "y": 350,
+                "type": "bush"
+            },
+            {
+                "height": 50,
+                "width": 50,
+                "x": 150,
+                "y": 350,
+                "type": "bush"
             }
         ],
         "characters": [],
