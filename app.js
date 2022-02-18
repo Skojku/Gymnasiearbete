@@ -53,7 +53,7 @@ app.get('/world_file', (req, res) => {
             return
         }
         res.setHeader('Content-Type', 'application/json')
-        res.send(JSON.parse(data))
+        res.send(data)
     })
 })
 

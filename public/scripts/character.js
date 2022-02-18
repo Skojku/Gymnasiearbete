@@ -1,6 +1,9 @@
-class Character extends Collision_base {
+class Character{
     constructor(height, width, x, y, color, username) {
-        super(height, width, x, y)
+        this.height = height
+        this.width = width
+        this.x = x
+        this.y = y
         this.color = color
         this.username = username
         this.newX = x
@@ -36,5 +39,16 @@ class Character extends Collision_base {
         let x = (this.username.length*10)/2
         ctx.fillText(this.username, this.x-x+(this.width/2), this.y-2)
         ctx.fillRect(this.x, this.y, this.width, this.height)
+    }
+
+    createCharacter(json) {
+        this.height = json.height
+        this.width = json.width
+        this.x = json.x
+        this.y = json.y
+        this.color = json.color
+        this.username = json.username
+        this.newX = json.x
+        this.newY = json.y
     }
 }

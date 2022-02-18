@@ -16,4 +16,12 @@ class Obstacle extends Collision_base {
         }
         ctx.fillRect(this.x,this.y,this.width,this.height)
     }
+
+    createObstacle(json) {
+        this.height = json.height
+        this.width = json.width
+        this.x = json.x
+        this.y = json.y
+        this.type = json.type
+    }
 }

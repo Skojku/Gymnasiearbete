@@ -2,13 +2,18 @@ $(() => {
     canvas.height = 500
     canvas.width = 500
 
-    const screen = new Screen(0, [-1, -1, -1, -1], false)
+    var screen = new Screen(0, [-1, -1, -1, -1], false)
     var selected_item = $("#select_obstacle").val()
+    var screens = []
 
-    $.get("/world_file", ((data) => {
-        console.log(data);
-        }), "application/json"
-    )
+    $.get("/world_file", (data) => {
+        console.log(screen);
+        data.forEach(s => {
+            screens.push(Screen.from(s))
+            $("#edit_screen").append(`<option value="${s.number}">${s.number}</option>`)
+        })
+    })
+
 
     drawGrid()
     function drawGrid() {
@@ -45,6 +50,20 @@ $(() => {
         selected_item = $("#select_obstacle").val()
     })
 
+    $("#edit_screen").change(() => {
+        console.log('---------------');
+        console.log(screens);
+        screen = screens.find(s => {return $("#edit_screen").val() === s.number}) //selected_screen
+        console.log('-------------');
+        console.log(screen);
+        $("#next1").val(screen.nextScreens[0])
+        $("#next2").val(screen.nextScreens[1])
+        $("#next3").val(screen.nextScreens[2])
+        $("#next4").val(screen.nextScreens[3])
+        $("#number").val(screen.number)
+        clear_canvas()
+    })
+
     $("#submit").click(() => {
         console.log('klick')
         screen.number = $("#number").val()
@@ -61,22 +80,27 @@ $(() => {
 
     //clear canvas
     $("#clearC").click(() => {
-        screen.removeObstacles()
-        ctx.clearRect(0, 0, canvas.width, canvas.height) //clear canvas
-        screen.draw()
-        drawGrid()
+        clear_canvas()
     })
 
     //clear everything
     $("#clearE").click(() => {
+        clear_settings()
+        clear_canvas()
+    })
+
+    function clear_canvas() {
+        screen.removeObstacles()
+        ctx.clearRect(0, 0, canvas.width, canvas.height) //clear canvas
+        screen.draw()
+        drawGrid()
+    }
+
+    function clear_settings() {
         $("#next1").val(-1)
         $("#next2").val(-1)
         $("#next3").val(-1)
         $("#next4").val(-1)
         $("#number").val(0)
-        screen.removeObstacles()
-        ctx.clearRect(0, 0, canvas.width, canvas.height) //clear canvas
-        screen.draw()
-        drawGrid()
-    })
+    }
 })

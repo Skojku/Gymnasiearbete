@@ -51,4 +51,16 @@ class Screen {
             c.draw()
         })
     }
+
+    //läs från json-fil
+    static from(json) {
+        console.log(json);
+        console.log(JSON.stringify(json, null, 4))
+        let s = new Screen(json.number, json.nextScreens, json.active)
+        json.obstacles.forEach(o => {
+            s.obstacles.push(new Obstacle(o.width, o.height, o.x, o.y, o.type))
+        })
+        s.characters = []
+        return s
+    }
 }
