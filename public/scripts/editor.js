@@ -6,14 +6,22 @@ $(() => {
     var selected_item = $("#select_obstacle").val()
     var screens = []
 
-    $.get("/world_file", (data) => {
-        console.log(screen);
-        data.forEach(s => {
-            screens.push(Screen.from(s))
-            $("#edit_screen").append(`<option value="${s.number}">${s.number}</option>`)
+    get_world_file()
+
+    function get_world_file() {
+        $.get("/world_file", (data) => {
+            console.log('@@@@@@@@@@@@@@@@@@@');
+            console.log(data)
+            screens = []
+            $("#edit_screen").empty()
+            $("#edit_screen").append('<option value="first" selected>Choose screen to edit</option>')
+            data.forEach(s => {
+                screens.push(Screen.from(s))
+                $("#edit_screen").append(`<option value="${s.number}">${s.number}</option>`)
+            })
+            console.log(screens)
         })
-        console.log(screens);
-    })
+    }
 
 
     drawGrid()
@@ -39,11 +47,19 @@ $(() => {
 
         let i = Math.floor(x / 50)
         let j = Math.floor(y / 50)
-        console.log(i + " , " + j)
+        //console.log(i + " , " + j)
 
-        if (selected_item !== "first") {
+        if (selected_item !== "erase") {
             screen.addObstacle(new Obstacle(50, 50, i * 50, j * 50, selected_item))
-            screen.draw()
+            redraw_canvas()
+        } else {
+            screen.obstacles.forEach((o, a) => {
+                if (o.x === i * 50 && o.y === j * 50) {
+                    console.log(a)
+                    screen.obstacles.splice(a, 1)
+                    redraw_canvas()
+                }
+            })
         }
     })
 
@@ -52,26 +68,30 @@ $(() => {
     })
 
     $("#edit_screen").change(() => {
-        console.log('---------------');
-        console.log(screens[0].obstacles);
-        screen = screens.find(s => {return parseInt($("#edit_screen").val()) === s.number}) //selected_screen
-        console.log('-------------');
-        console.log(screen);
-        $("#next1").val(screen.nextScreens[0])
-        $("#next2").val(screen.nextScreens[1])
-        $("#next3").val(screen.nextScreens[2])
-        $("#next4").val(screen.nextScreens[3])
-        $("#number").val(screen.number)
-        ctx.clearRect(0, 0, canvas.width, canvas.height) //clear canvas
-        drawGrid()
-        screen.draw()
+        /* console.log('---------------')
+        console.log(screens[0].obstacles) */
+        if ($("#edit_screen").val() !== 'first') {
+            let nscreen = screens.find(s => { return parseInt($("#edit_screen").val()) === s.number }) //selected_screen
+            console.log(JSON.stringify(nscreen));
+            screen = Screen.from(structuredClone(nscreen))
+            $("#next1").val(screen.nextScreens[0])
+            $("#next2").val(screen.nextScreens[1])
+            $("#next3").val(screen.nextScreens[2])
+            $("#next4").val(screen.nextScreens[3])
+            $("#number").val(screen.number)
+            redraw_canvas()
+        } else {
+            screen.removeObstacles()
+            clear_settings()
+            redraw_canvas()
+        }
     })
 
     $("#submit").click(() => {
         console.log('klick')
         screen.number = parseInt($("#number").val())
         screen.nextScreens = [parseInt($("#next1").val()), parseInt($("#next2").val()), parseInt($("#next3").val()), parseInt($("#next4").val())]
-        console.log(screen);
+        console.log(screen)
         $.ajax({
             type: "POST",
             url: "/update_world",
@@ -79,21 +99,23 @@ $(() => {
             contentType: 'application/json; charset=utf-8',
             dataType: "json"
         })
+        get_world_file()
     })
 
     //clear canvas
     $("#clearC").click(() => {
-        clear_canvas()
+        screen.removeObstacles()
+        redraw_canvas()
     })
 
     //clear everything
     $("#clearE").click(() => {
+        screen.removeObstacles()
         clear_settings()
-        clear_canvas()
+        redraw_canvas()
     })
 
-    function clear_canvas() {
-        screen.removeObstacles()
+    function redraw_canvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height) //clear canvas
         screen.draw()
         drawGrid()

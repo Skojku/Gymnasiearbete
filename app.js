@@ -47,6 +47,7 @@ app.get('/game', (req, res) => {
 })
 
 app.get('/world_file', (req, res) => {
+    console.log('ayo')
     fs.readFile('world_file.json', (err, data) => {
         if (err) {
             console.error(err)
@@ -69,12 +70,13 @@ app.post('/update_world', (req, res) => {
     fs.readFile('world_file.json', (err, data) => {
         var json = JSON.parse(data)
         json.push(req.body)
-        fs.writeFile("world_file.json", JSON.stringify(json, null, 4), err => {
+        /* fs.writeFile("world_file.json", JSON.stringify(json, null, 4), err => {
             if (err) {
                 console.error(err)
                 return
             }
-        })
+        }) */
+        fs.writeFileSync("world_file.json", JSON.stringify(json, null, 4))
     })
 })
 
