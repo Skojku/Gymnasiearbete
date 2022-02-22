@@ -5,7 +5,16 @@ class Screen {
         this.obstacles = []
         this.characters = []
         this.active = active
-        nextScreens.forEach((n, i) => {
+    }
+
+    addBorders() {
+        for (let i = 0; i < this.obstacles.length; i++) { //ta bort alla borders
+            if (this.obstacles[i].type == "border") {
+                this.obstacles.splice(i, 1)
+                i--
+            }
+        }
+        this.nextScreens.forEach((n, i) => { //lägg till nya
             if (n === -1) {
                 switch (i) {
                     case 0:
@@ -56,13 +65,13 @@ class Screen {
     static from(json) {
         //console.log(json);
         let s = new Screen(json.number, json.nextScreens, json.active)
-        console.log(json.obstacles);
+        //console.log(json.obstacles);
         json.obstacles.forEach(o => {
             s.obstacles.push(new Obstacle(o.width, o.height, o.x, o.y, o.type))
         })
         s.characters = []
-        console.log('sssssssssss');
-        console.log(s);
+        //console.log('sssssssssss');
+        //console.log(s);
         return s
     }
 }

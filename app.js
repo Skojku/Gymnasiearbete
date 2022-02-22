@@ -13,8 +13,8 @@ var online_users = []
 
 // --------TODO---------
 // world editor
-// bättre kollision
 // fixa items och inventory
+// bättre kollision
 // fixa sprites
 
 var req1
@@ -67,17 +67,12 @@ app.get('/editor', (req, res) => {
 })
 
 app.post('/update_world', (req, res) => {
-    fs.readFile('world_file.json', (err, data) => {
-        var json = JSON.parse(data)
-        json.push(req.body)
-        /* fs.writeFile("world_file.json", JSON.stringify(json, null, 4), err => {
-            if (err) {
-                console.error(err)
-                return
-            }
-        }) */
-        fs.writeFileSync("world_file.json", JSON.stringify(json, null, 4))
-    })
+    /* fs.readFile('world_file.json', (err, data) => {
+        //var json = JSON.parse(data)
+        //json.push(req.body)
+        fs.writeFileSync("world_file.json", JSON.stringify(req.body, null, 4))
+    }) */
+    fs.writeFileSync("world_file.json", JSON.stringify(req.body, null, 4))
 })
 
 app.get('/user', (req, res) => {

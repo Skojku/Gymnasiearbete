@@ -6,11 +6,11 @@ function game() {
     var player
 
     var screens = []
-    screens[0] = new Screen(0, [1, -1, -1, -1], false)
+    /* screens[0] = new Screen(0, [1, -1, -1, -1], false)
     screens[0].obstacles.push(new Obstacle(50, 50, 300, 300, "tree"))
     screens[0].obstacles.push(new Obstacle(50, 50, 195, 300, "bush"))
     screens[1] = new Screen(1, [-1, -1, 0, -1], false)
-    screens[1].obstacles.push(new Obstacle(50, 50, 100, 100, "stone"))
+    screens[1].obstacles.push(new Obstacle(50, 50, 100, 100, "stone")) */
     var screen
 
     var keys = {
@@ -19,6 +19,14 @@ function game() {
         right: false,
         left: false
     }
+
+    $.get("/world_file", (data) => {
+        data.forEach(s => {
+            screens.push(Screen.from(s))
+        })
+        console.log('---------------------');
+        console.log(screens)
+    })
 
     socket.on('player', (user, characters2) => { //kolla på det här sen
         screens.forEach((s1) => {

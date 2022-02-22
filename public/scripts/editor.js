@@ -10,8 +10,8 @@ $(() => {
 
     function get_world_file() {
         $.get("/world_file", (data) => {
-            console.log('@@@@@@@@@@@@@@@@@@@');
-            console.log(data)
+            //console.log('@@@@@@@@@@@@@@@@@@@');
+            //console.log(data)
             screens = []
             $("#edit_screen").empty()
             $("#edit_screen").append('<option value="first" selected>Choose screen to edit</option>')
@@ -19,7 +19,7 @@ $(() => {
                 screens.push(Screen.from(s))
                 $("#edit_screen").append(`<option value="${s.number}">${s.number}</option>`)
             })
-            console.log(screens)
+            //console.log(screens)
         })
     }
 
@@ -72,7 +72,7 @@ $(() => {
         console.log(screens[0].obstacles) */
         if ($("#edit_screen").val() !== 'first') {
             let nscreen = screens.find(s => { return parseInt($("#edit_screen").val()) === s.number }) //selected_screen
-            console.log(JSON.stringify(nscreen));
+            //console.log(JSON.stringify(nscreen));
             screen = Screen.from(structuredClone(nscreen))
             $("#next1").val(screen.nextScreens[0])
             $("#next2").val(screen.nextScreens[1])
@@ -91,14 +91,30 @@ $(() => {
         console.log('klick')
         screen.number = parseInt($("#number").val())
         screen.nextScreens = [parseInt($("#next1").val()), parseInt($("#next2").val()), parseInt($("#next3").val()), parseInt($("#next4").val())]
+        screen.addBorders()
         console.log(screen)
+        let found = false
+        for (let i = 0; i < screens.length; i++) {
+            if (screens[i].number === screen.number) {
+                screens[i] = screen
+                found = true
+                console.log(screens[i]);
+            }
+        }
+        if (!found) {
+            screens.push(screen)
+        }
+        console.log(screens);
         $.ajax({
             type: "POST",
             url: "/update_world",
-            data: JSON.stringify(screen),
+            data: JSON.stringify(screens),
             contentType: 'application/json; charset=utf-8',
             dataType: "json"
         })
+        screen.removeObstacles()
+        clear_settings()
+        redraw_canvas()
         get_world_file()
     })
 
