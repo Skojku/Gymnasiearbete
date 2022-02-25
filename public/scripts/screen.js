@@ -3,6 +3,7 @@ class Screen {
         this.number = number
         this.nextScreens = nextScreens
         this.obstacles = []
+        this.items = []
         this.characters = []
         this.active = active
     }
@@ -56,6 +57,9 @@ class Screen {
         this.obstacles.forEach((o) => {
             o.draw()
         })
+        this.items.forEach(i => {
+            i.draw()
+        })
         this.characters.forEach((c) => {
             c.draw()
         })
@@ -68,6 +72,9 @@ class Screen {
         //console.log(json.obstacles);
         json.obstacles.forEach(o => {
             s.obstacles.push(new Obstacle(o.width, o.height, o.x, o.y, o.type))
+        })
+        json.items.forEach(i => {
+            s.items.push(new Item(i.width, i.height, i.x, i.y, i.type))
         })
         s.characters = []
         //console.log('sssssssssss');

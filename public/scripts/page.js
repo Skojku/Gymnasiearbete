@@ -19,7 +19,7 @@ function page() {
     })
 
     socket.on("active_users", (users) => {
-        console.log('active users')
+        //console.log('active users')
         active_users = users
         printUsers()
     })
@@ -38,7 +38,7 @@ function page() {
 
     function printUsers() {
         $("#users").empty()
-        console.log(username)
+        //console.log(username)
         active_users.forEach(user => {
             if (user === username) {
                 $("#users").append(`<li>${user} (you)</li>`)

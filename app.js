@@ -12,10 +12,11 @@ var users = require('./hardcoded_database')
 var online_users = []
 
 // --------TODO---------
-// world editor
-// fixa items och inventory
+//x world editor (fixa items)
+//x fixa items och inventory
 // bättre kollision
 // fixa sprites
+// databas
 
 var req1
 
@@ -67,11 +68,6 @@ app.get('/editor', (req, res) => {
 })
 
 app.post('/update_world', (req, res) => {
-    /* fs.readFile('world_file.json', (err, data) => {
-        //var json = JSON.parse(data)
-        //json.push(req.body)
-        fs.writeFileSync("world_file.json", JSON.stringify(req.body, null, 4))
-    }) */
     fs.writeFileSync("world_file.json", JSON.stringify(req.body, null, 4))
 })
 
@@ -164,7 +160,7 @@ io.on('connection', (socket) => {
         console.log("------online_users------")
         console.log(online_users)
         io.emit("active_users", online_users.map(u => { return u.username }))
-        io.emit("remove_character", socket.user.username)
+        io.emit("remove_character", socket.user)
     })
 
     socket.on("pong", () => {
@@ -181,6 +177,10 @@ io.on('connection', (socket) => {
         socket.user.screen = newScreen
         //console.log(socket.user.username + " screeeeen");
         socket.broadcast.emit('change_screen', screen, newScreen, socket.user.username)
+    })
+
+    socket.on('item taken', (screen_nr, item_index) => {
+        socket.broadcast.emit('item taken', screen_nr, item_index)
     })
 })
 

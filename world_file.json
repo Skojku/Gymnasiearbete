@@ -2,7 +2,7 @@
     {
         "number": 0,
         "nextScreens": [
-            0,
+            1,
             3,
             -1,
             -1
@@ -93,6 +93,15 @@
                 "type": "border"
             }
         ],
+        "items": [
+            {
+                "height": 20,
+                "width": 20,
+                "x": 100,
+                "y": 50,
+                "type": "rock"
+            }
+        ],
         "characters": [],
         "active": false
     },
@@ -176,6 +185,7 @@
                 "type": "border"
             }
         ],
+        "items": [],
         "characters": [],
         "active": false
     },
@@ -287,6 +297,7 @@
                 "type": "border"
             }
         ],
+        "items": [],
         "characters": [],
         "active": false
     },
@@ -391,6 +402,7 @@
                 "type": "border"
             }
         ],
+        "items": [],
         "characters": [],
         "active": false
     }

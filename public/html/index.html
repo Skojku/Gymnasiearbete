@@ -9,6 +9,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="./scripts/page.js"></script>
     <script src="./scripts/collision_base.js"></script>
+    <script src="./scripts/item.js"></script>
     <script src="./scripts/character.js"></script>
     <script src="./scripts/obstacle.js"></script>
     <script src="./scripts/screen.js"></script>
@@ -45,13 +46,13 @@
         let promise = new Promise((resolve) => {
             $.get("/user", (u) => {
                 resolve(u)
-                console.log(u + " 1")
+                //console.log(u + " 1")
             })
         })
         promise.then((value) => {
-            console.log('then')
+            //console.log('then')
             username = value
-            console.log(username + " 2")
+            //console.log(username + " 2")
             socket = io()
             page()
             game()

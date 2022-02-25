@@ -6,11 +6,6 @@ function game() {
     var player
 
     var screens = []
-    /* screens[0] = new Screen(0, [1, -1, -1, -1], false)
-    screens[0].obstacles.push(new Obstacle(50, 50, 300, 300, "tree"))
-    screens[0].obstacles.push(new Obstacle(50, 50, 195, 300, "bush"))
-    screens[1] = new Screen(1, [-1, -1, 0, -1], false)
-    screens[1].obstacles.push(new Obstacle(50, 50, 100, 100, "stone")) */
     var screen
 
     var keys = {
@@ -24,8 +19,8 @@ function game() {
         data.forEach(s => {
             screens.push(Screen.from(s))
         })
-        console.log('---------------------');
-        console.log(screens)
+        //console.log('---------------------');
+        //console.log(screens)
     })
 
     socket.on('player', (user, characters2) => { //kolla på det här sen
@@ -53,8 +48,8 @@ function game() {
         screens[user.screen].characters.push(new Character(50, 50, user.pos[0], user.pos[1], 'blue', user.username))
     })
 
-    socket.on('remove_character', (username) => {
-        screen.characters.splice(screen.characters.indexOf(screen.characters.find((c) => { return c.username === username })), 1)
+    socket.on('remove_character', (user) => {
+        screens[user.screen].characters.splice(screens[user.screen].characters.indexOf(screens[user.screen].characters.find((c) => { return c.username === user.username })), 1)
     })
 
     socket.on('position', (user) => { //ändra andras position
@@ -74,13 +69,22 @@ function game() {
                 //console.log("-----------------");
                 //console.log(user);
                 //console.log(s1.characters);
-            } 
+            }
         })
         screens.forEach(s1 => {
             if (s1.number === newS) {
                 //console.log('u: ' + u);
                 //console.log(user.username + " -----------");
                 s1.characters.push(user)
+            }
+        })
+    })
+
+    socket.on('item taken', (screen_nr, item_index) => {
+        console.log('item taken');
+        screens.forEach(s => {
+            if (s.number === screen_nr) {
+                s.items.splice(item_index, 1)
             }
         })
     })
@@ -104,31 +108,32 @@ function game() {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height) //clear canvas
         if (player) { //om player är loadad
-            if ((keys.right || keys.left || keys.up || keys.down) && !isCollide(player, screen.obstacles)) {
+            if ((keys.right || keys.left || keys.up || keys.down) && isCollide(player, screen.obstacles) === -1) {
                 //console.log(!isCollide(player, screen.obstacles))
                 player.updateOwnPosition()
                 socket.emit('position', [player.x, player.y])
+                player.addItem(new Item(10, 10, 10, 10, "torch"))
             } else {
                 player.resetNewPos()
             }
             checkIfNewScreen()
             $("#screen_nr").html("Screen: " + screen.number);
             //console.log(player.x);
-            player.draw()
             screen.draw()
+            player.draw()
         }
     }
 
     window.requestAnimationFrame(game_loop)
 
     function isCollide(player, obstacles) {
-        let isColliding = false
-        obstacles.forEach(o => {
+        let isColliding = -1
+        obstacles.forEach((o, index) => {
             if (!(((player.newY + player.height) < (o.y)) ||
                 (player.newY > (o.y + o.height)) ||
                 ((player.newX + player.width) < o.x) ||
                 (player.newX > (o.x + o.width)))) {
-                isColliding = true
+                isColliding = index
             }
         })
         return isColliding
@@ -186,6 +191,7 @@ function game() {
 
     $(window).keydown((e) => {
         let key = e.which
+        //console.log(key)
         switch (key) {
             case 65: //a
                 keys.right = true
@@ -200,7 +206,17 @@ function game() {
                 keys.up = true
                 break
             case 32: //space
+                e.preventDefault()
                 console.log("space")
+                break
+            case 70: //f
+                let i = isCollide(player, screen.items)
+                if (i !== -1) {
+                    player.addItem(screen.items[i])
+                    screen.items.splice(i, 1)
+                    socket.emit('item taken', screen.number, i)
+                }
+                player.printInventory()
                 break
             default:
                 break

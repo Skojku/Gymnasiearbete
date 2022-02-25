@@ -8,6 +8,30 @@ class Character{
         this.username = username
         this.newX = x
         this.newY = y
+        this.inventory = {}
+    }
+
+    addItem(i) {
+        let in_inventory = false
+        for (const key in this.inventory) {
+            if (i.type == key) {
+                in_inventory = true
+                if (i.stack_size > this.inventory[key]) {
+                    console.log(key)
+                    this.inventory[key]++
+                }
+            }
+        }
+        if (!in_inventory) {
+            console.log('inte i inventory');
+            this.inventory[i.type] = 1
+        }
+    }
+
+    printInventory() {
+        for (const key in this.inventory) {
+            console.log(key + " " + this.inventory[key]);
+        }
     }
 
     updatePosition(pos) {
@@ -50,5 +74,6 @@ class Character{
         this.username = json.username
         this.newX = json.x
         this.newY = json.y
+        this.inventory = []
     }
 }
