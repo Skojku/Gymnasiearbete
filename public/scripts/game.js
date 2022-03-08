@@ -108,11 +108,10 @@ function game() {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height) //clear canvas
         if (player) { //om player är loadad
-            if ((keys.right || keys.left || keys.up || keys.down) && isCollide(player, screen.obstacles) === -1) {
+            if ((keys.right || keys.left || keys.up || keys.down) && !isCollideObjects(player, screen.obstacles)) {
                 //console.log(!isCollide(player, screen.obstacles))
                 player.updateOwnPosition()
                 socket.emit('position', [player.x, player.y])
-                player.addItem(new Item(10, 10, 10, 10, "torch"))
             } else {
                 player.resetNewPos()
             }
@@ -126,7 +125,28 @@ function game() {
 
     window.requestAnimationFrame(game_loop)
 
-    function isCollide(player, obstacles) {
+    function isCollideObjects(player, obstacles) {
+        obstacles.forEach(o => { //spelaren kommer från: 
+            if (!(player.newY + player.height < o.y)) { //ovan
+                //player.y += o.y - (player.y + player.height)
+                console.log(player.newY + player.height)
+                console.log(o.y)
+                return true
+            } else if (!(player.newY > o.y + o.height)) { //under
+                //player.y -= player.y - (o.y + o.height)
+                return true
+            } else if (!(player.newX + player.width < o.x)) { //vänster
+                //player.x += o.x - (player.x + player.width)
+                return true
+            } else if (!(player.newX > o.x + o.width)) { //höger
+                //player.x -= player.x - (o.x + o.width)
+                return true
+            }
+        })
+        return false
+    }
+
+    function isCollideItems(player, obstacles) {
         let isColliding = -1
         obstacles.forEach((o, index) => {
             if (!(((player.newY + player.height) < (o.y)) ||
@@ -189,6 +209,17 @@ function game() {
         return screens.find((screen) => { return screen.active === true })
     }
 
+    function updateInventoryHTML() {
+        $("#inventory").empty();
+        for (const type in player.inventory) {
+            $("#inventory").append(`<li>${capitalizeFirstLetter(type)} ${player.inventory[type]}</li>`)
+        }
+    }
+
+    function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
     $(window).keydown((e) => {
         let key = e.which
         //console.log(key)
@@ -210,9 +241,10 @@ function game() {
                 console.log("space")
                 break
             case 70: //f
-                let i = isCollide(player, screen.items)
-                if (i !== -1) {
+                let i = isCollideItems(player, screen.items)
+                if (i !== -1 && !player.inventoryFull(screen.items[i])) {
                     player.addItem(screen.items[i])
+                    updateInventoryHTML()
                     screen.items.splice(i, 1)
                     socket.emit('item taken', screen.number, i)
                 }

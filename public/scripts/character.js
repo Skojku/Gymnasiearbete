@@ -11,19 +11,19 @@ class Character{
         this.inventory = {}
     }
 
-    addItem(i) {
-        let in_inventory = false
-        for (const key in this.inventory) {
-            if (i.type == key) {
-                in_inventory = true
-                if (i.stack_size > this.inventory[key]) {
-                    console.log(key)
-                    this.inventory[key]++
-                }
+    inventoryFull(item) {
+        if (item.type in this.inventory) {
+            if (item.stack_size == this.inventory[item.type]) {
+                return true
             }
         }
-        if (!in_inventory) {
-            console.log('inte i inventory');
+        return false
+    }
+
+    addItem(i) {
+        if (i.type in this.inventory) {
+            this.inventory[i.type]++
+        } else {
             this.inventory[i.type] = 1
         }
     }
