@@ -108,7 +108,7 @@ function game() {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height) //clear canvas
         if (player) { //om player är loadad
-            if ((keys.right || keys.left || keys.up || keys.down) && !isCollideObjects(player, screen.obstacles)) {
+            if ((keys.right || keys.left || keys.up || keys.down) && isCollideV3(player, screen.obstacles, keys) === -1) {
                 //console.log(!isCollide(player, screen.obstacles))
                 player.updateOwnPosition()
                 socket.emit('position', [player.x, player.y])
@@ -117,6 +117,10 @@ function game() {
             }
             checkIfNewScreen()
             $("#screen_nr").html("Screen: " + screen.number);
+            $("#player_x").html("Player_x: " + player.x);
+            $("#player_y").html("Player_y: " + player.y);
+            $("#obstacle_x").html("obstacle[0]_x: " + screen.obstacles[0].x);
+            $("#obstacle_y").html("obstacle[0]_y: " + screen.obstacles[0].y);
             //console.log(player.x);
             screen.draw()
             player.draw()
@@ -125,12 +129,47 @@ function game() {
 
     window.requestAnimationFrame(game_loop)
 
+    function isCollideV3(player, obstacles, dirs) {
+        isColliding = -1
+        obstacles.forEach((o, i)=> {
+            if (!(((player.newY + player.height) <= (o.y)) ||
+                (player.newY >= (o.y + o.height)) ||
+                ((player.newX + player.width) <= o.x) ||
+                (player.newX >= (o.x + o.width)))) { //om alla false
+                isColliding = i
+            }
+        })
+        if (isColliding !== -1) {
+            for (const dir in dirs) {
+                if (dirs[dir]) { 
+                    switch (dir) { //spelaren går: 
+                        case "up": // upp
+                            player.y -= player.y - (obstacles[isColliding].y + obstacles[isColliding].height)
+                            break;
+                        case "down": //ner
+                            player.y += obstacles[isColliding].y - (player.y + player.height)
+                            break;
+                        case "right": //höger
+                            player.x -= player.x - (obstacles[isColliding].x + obstacles[isColliding].width)
+                            break;
+                        case "left": //vänster
+                            player.x += obstacles[isColliding].x - (player.x + player.width)
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+        return isColliding
+    }
+
     function isCollideObjects(player, obstacles) {
-        obstacles.forEach(o => { //spelaren kommer från: 
-            if (!(player.newY + player.height < o.y)) { //ovan
+        obstacles.forEach((o, i) => { //spelaren kommer från: 
+            if (player.newY + player.height > o.y && player.newY < o.y + o.height && (player.newX + player.width > o.x || player.newX < o.x + o.width)) { //ovan
                 //player.y += o.y - (player.y + player.height)
                 console.log(player.newY + player.height)
-                console.log(o.y)
+                console.log(i, o.type)
                 return true
             } else if (!(player.newY > o.y + o.height)) { //under
                 //player.y -= player.y - (o.y + o.height)
@@ -143,16 +182,17 @@ function game() {
                 return true
             }
         })
+        console.log('false');
         return false
     }
 
     function isCollideItems(player, obstacles) {
         let isColliding = -1
-        obstacles.forEach((o, index) => {
+        obstacles.forEach((o, index) => { //[]
             if (!(((player.newY + player.height) < (o.y)) ||
                 (player.newY > (o.y + o.height)) ||
                 ((player.newX + player.width) < o.x) ||
-                (player.newX > (o.x + o.width)))) {
+                (player.newX > (o.x + o.width)))) { //om alla false
                 isColliding = index
             }
         })

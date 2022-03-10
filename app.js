@@ -9,6 +9,7 @@ const session = require('express-session')
 const fs = require('fs')
 
 var users = require('./hardcoded_database')
+const { randomBytes } = require('crypto')
 var online_users = []
 
 // --------TODO---------
@@ -24,7 +25,7 @@ app.use(express.static('./public'))
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 app.use(session({
-    secret: "aaaaaaaaaaaaa",
+    secret: randomBytes(4).toString('hex'),
     resave: true,
     saveUninitialized: false
 }))
