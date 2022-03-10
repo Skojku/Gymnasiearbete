@@ -18,6 +18,13 @@
             {
                 "height": 50,
                 "width": 50,
+                "x": 200,
+                "y": 200,
+                "type": "bush"
+            },
+            {
+                "height": 50,
+                "width": 50,
                 "x": 300,
                 "y": 200,
                 "type": "bush"

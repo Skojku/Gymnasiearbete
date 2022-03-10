@@ -98,8 +98,8 @@ function game() {
         const dt = (timestamp - previous_timestamp) / 1000
         previous_timestamp = timestamp
 
-        if (keys.right) { player.moveX(-speed * dt) }
-        if (keys.left) { player.moveX(speed * dt) }
+        if (keys.right) { player.moveX(speed * dt) }
+        if (keys.left) { player.moveX(-speed * dt) }
         if (keys.up) { player.moveY(-speed * dt) }
         if (keys.down) { player.moveY(speed * dt) }
         //console.log(keys)
@@ -108,30 +108,129 @@ function game() {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height) //clear canvas
         if (player) { //om player är loadad
-            if ((keys.right || keys.left || keys.up || keys.down) && isCollideV3(player, screen.obstacles, keys) === -1) {
+            /* let moving = false
+            if (keys.right && isCollideV4(player, screen.obstacles, "right") === -1) {
+                moving = true
+
+            }
+            else if (keys.left && isCollideV4(player, screen.obstacles, "left") === -1) {
+                moving = true
+            }
+            else if (keys.up && isCollideV4(player, screen.obstacles, "up") === -1) {
+                moving = true
+            }
+            else if (keys.down && isCollideV4(player, screen.obstacles, "down") === -1) {
+                moving = true
+            } */
+            /* if ((keys.right || keys.left || keys.up || keys.down) && isCollideV3(player, screen.obstacles, keys) === -1) {
                 //console.log(!isCollide(player, screen.obstacles))
                 player.updateOwnPosition()
                 socket.emit('position', [player.x, player.y])
             } else {
                 player.resetNewPos()
+            } */
+            /* if (moving) {
+                player.updateOwnPosition()
+                socket.emit('position', [player.x, player.y])
+            } else {
+                player.resetNewPos()
+            } */
+
+            if ((keys.right || keys.left || keys.up || keys.down)) {
+                let collisionIndex = isCollideV4(player, screen.obstacles)
+                if (collisionIndex !== -1) {
+                    for (const dir in keys) {
+                        if (keys[dir]) {
+                            console.log(dir);
+                            player.resetNewPos()
+                            moveToObstacle(screen.obstacles[collisionIndex], dir)
+                        }
+                    }
+                } else {
+                    player.updateOwnPosition()
+                }
             }
-            checkIfNewScreen()
-            $("#screen_nr").html("Screen: " + screen.number);
-            $("#player_x").html("Player_x: " + player.x);
-            $("#player_y").html("Player_y: " + player.y);
-            $("#obstacle_x").html("obstacle[0]_x: " + screen.obstacles[0].x);
-            $("#obstacle_y").html("obstacle[0]_y: " + screen.obstacles[0].y);
-            //console.log(player.x);
-            screen.draw()
-            player.draw()
+
+            {
+                checkIfNewScreen()
+                $("#screen_nr").html("Screen: " + screen.number);
+                $("#player_x").html("Player_x: " + player.x);
+                $("#player_y").html("Player_y: " + player.y);
+                $("#obstacle_x").html("obstacle[0]_x: " + screen.obstacles[0].x);
+                $("#obstacle_y").html("obstacle[0]_y: " + screen.obstacles[0].y);
+                //console.log(player.x);
+                screen.draw()
+                player.draw()
+            }
         }
     }
 
     window.requestAnimationFrame(game_loop)
 
+    function isCollideV4(player, obstacles) {
+        isColliding = -1
+        obstacles.forEach((o, i) => {
+            if (!(((player.newY + player.height) <= (o.y)) ||
+                (player.newY >= (o.y + o.height)) ||
+                ((player.newX + player.width) <= o.x) ||
+                (player.newX >= (o.x + o.width)))) { //om alla false
+                isColliding = i
+            }
+        })
+        /* if (isColliding !== -1) {
+            console.log(dir);
+            console.log(isColliding);
+            switch (dir) { //spelaren går: 
+                case "up": // upp
+                    player.y -= player.y - (obstacles[isColliding].y + obstacles[isColliding].height)
+                    break;
+                case "down": //ner
+                    console.log(player.y);
+                    player.y += obstacles[isColliding].y - (player.y + player.height)
+                    console.log(player.y);
+                    //console.log(player.y);
+                    break;
+                case "right": //höger
+                    console.log(player.x);
+                    player.x += obstacles[isColliding].x - (player.x + player.width)
+                    console.log(player.x);
+                    break;
+                case "left": //vänster
+                    player.x -= player.x - (obstacles[isColliding].x + obstacles[isColliding].width)
+                    break;
+                default:
+                    break;
+            }
+        } */
+        return isColliding
+    }
+
+    function moveToObstacle(obstacle, dir) {
+        switch (dir) { //spelaren går:
+            case "up": // upp
+                player.y -= player.y - (obstacle.y + obstacle.height)
+                break;
+            case "down": //ner
+                //console.log(player.y);
+                player.y += obstacle.y - (player.y + player.height)
+                //console.log(player.y);
+                break;
+            case "right": //höger
+                //console.log(player.x);
+                player.x += obstacle.x - (player.x + player.width)
+                //console.log(player.x);
+                break;
+            case "left": //vänster
+                player.x -= player.x - (obstacle.x + obstacle.width)
+                break;
+            default:
+                break;
+        }
+    }
+
     function isCollideV3(player, obstacles, dirs) {
         isColliding = -1
-        obstacles.forEach((o, i)=> {
+        obstacles.forEach((o, i) => {
             if (!(((player.newY + player.height) <= (o.y)) ||
                 (player.newY >= (o.y + o.height)) ||
                 ((player.newX + player.width) <= o.x) ||
@@ -141,19 +240,22 @@ function game() {
         })
         if (isColliding !== -1) {
             for (const dir in dirs) {
-                if (dirs[dir]) { 
+                if (dirs[dir]) {
+                    console.log(dir);
                     switch (dir) { //spelaren går: 
                         case "up": // upp
                             player.y -= player.y - (obstacles[isColliding].y + obstacles[isColliding].height)
                             break;
                         case "down": //ner
                             player.y += obstacles[isColliding].y - (player.y + player.height)
+                            //console.log(player.y);
                             break;
                         case "right": //höger
-                            player.x -= player.x - (obstacles[isColliding].x + obstacles[isColliding].width)
+                            console.log(player.y);
+                            player.x += obstacles[isColliding].x - (player.x + player.width)
                             break;
                         case "left": //vänster
-                            player.x += obstacles[isColliding].x - (player.x + player.width)
+                            player.x -= player.x - (obstacles[isColliding].x + obstacles[isColliding].width)
                             break;
                         default:
                             break;
@@ -265,10 +367,10 @@ function game() {
         //console.log(key)
         switch (key) {
             case 65: //a
-                keys.right = true
+                keys.left = true
                 break
             case 68: //d
-                keys.left = true
+                keys.right = true
                 break
             case 83: //s
                 keys.down = true
@@ -299,10 +401,10 @@ function game() {
         let key = e.which
         switch (key) {
             case 65: //a
-                keys.right = false
+                keys.left = false
                 break
             case 68: //d
-                keys.left = false
+                keys.right = false
                 break
             case 83: //s
                 keys.down = false
