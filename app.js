@@ -15,9 +15,10 @@ var online_users = []
 // --------TODO---------
 //x world editor (fixa items)
 //x fixa items och inventory
-// BÄTTRE COLLISION 
+//x BÄTTRE COLLISION
 // fixa sprites
 // databas
+// fixa f5 
 
 var req1
 

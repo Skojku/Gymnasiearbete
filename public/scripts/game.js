@@ -12,7 +12,8 @@ function game() {
         up: false,
         down: false,
         right: false,
-        left: false
+        left: false,
+        item: false,
     }
 
     $.get("/world_file", (data) => {
@@ -97,111 +98,82 @@ function game() {
         }
         const dt = (timestamp - previous_timestamp) / 1000
         previous_timestamp = timestamp
-
-        if (keys.right) { player.moveX(speed * dt) }
-        if (keys.left) { player.moveX(-speed * dt) }
-        if (keys.up) { player.moveY(-speed * dt) }
-        if (keys.down) { player.moveY(speed * dt) }
-        //console.log(keys)
-
-        //console.log(getActiveScreen())
-
         ctx.clearRect(0, 0, canvas.width, canvas.height) //clear canvas
         if (player) { //om player är loadad
-            /* let moving = false
-            if (keys.right && isCollideV4(player, screen.obstacles, "right") === -1) {
-                moving = true
-
-            }
-            else if (keys.left && isCollideV4(player, screen.obstacles, "left") === -1) {
-                moving = true
-            }
-            else if (keys.up && isCollideV4(player, screen.obstacles, "up") === -1) {
+            let dx = 0
+            let dy = 0
+            let moving = false
+            if (keys.right) {
+                dx = speed * dt
                 moving = true
             }
-            else if (keys.down && isCollideV4(player, screen.obstacles, "down") === -1) {
+            if (keys.left) {
+                dx = -speed * dt
                 moving = true
-            } */
-            /* if ((keys.right || keys.left || keys.up || keys.down) && isCollideV3(player, screen.obstacles, keys) === -1) {
-                //console.log(!isCollide(player, screen.obstacles))
-                player.updateOwnPosition()
-                socket.emit('position', [player.x, player.y])
-            } else {
-                player.resetNewPos()
-            } */
-            /* if (moving) {
-                player.updateOwnPosition()
-                socket.emit('position', [player.x, player.y])
-            } else {
-                player.resetNewPos()
-            } */
-
-            if ((keys.right || keys.left || keys.up || keys.down)) {
-                let collisionIndex = isCollideV4(player, screen.obstacles)
-                if (collisionIndex !== -1) {
-                    for (const dir in keys) {
-                        if (keys[dir]) {
-                            console.log(dir);
-                            player.resetNewPos()
-                            moveToObstacle(screen.obstacles[collisionIndex], dir)
-                        }
-                    }
-                } else {
-                    player.updateOwnPosition()
+            }
+            if (keys.up) {
+                dy = -speed * dt
+                moving = true
+            }
+            if (keys.down) {
+                dy = speed * dt
+                moving = true
+            }
+            if (keys.item) {
+                let i = isCollideItems(player, screen.items)
+                if (i !== -1 && !player.inventoryFull(screen.items[i])) {
+                    player.addItem(screen.items[i])
+                    updateInventoryHTML()
+                    screen.items.splice(i, 1)
+                    socket.emit('item taken', screen.number, i)
                 }
+                player.printInventory()
             }
+            if (moving) {
+                if (isCollide(player, screen.obstacles, dx, dy) !== -1) {
+                    if (dx > 0 && isCollide(player, screen.obstacles, dx, 0) !== -1) {
+                        moveToObstacle(screen.obstacles[isCollide(player, screen.obstacles, dx, 0)], 'right')
+                    } else if (dx < 0 && isCollide(player, screen.obstacles, dx, 0) !== -1) {
+                        moveToObstacle(screen.obstacles[isCollide(player, screen.obstacles, dx, 0)], 'left')
+                    }
+                    if (dy > 0 && isCollide(player, screen.obstacles, 0, dy) !== -1) {
+                        moveToObstacle(screen.obstacles[isCollide(player, screen.obstacles, 0, dy)], 'down')
+                    } else if (dy < 0 && isCollide(player, screen.obstacles, 0, dy) !== -1) {
+                        moveToObstacle(screen.obstacles[isCollide(player, screen.obstacles, 0, dy)], 'up')
+                    }
+                }
+                else {
+                    player.move(dx, dy)
+                }
+                socket.emit('position', [player.x, player.y])
+            }
+            checkIfNewScreen()
+            $("#screen_nr").html("Screen: " + screen.number);
+            $("#player_x").html("Player_x: " + player.x);
+            $("#player_y").html("Player_y: " + player.y);
+            $("#obstacle_x").html("obstacle[0]_x: " + screen.obstacles[0].x);
+            $("#obstacle_y").html("obstacle[0]_y: " + screen.obstacles[0].y);
+            //console.log(player.x);
+            screen.draw()
+            player.draw()
 
-            {
-                checkIfNewScreen()
-                $("#screen_nr").html("Screen: " + screen.number);
-                $("#player_x").html("Player_x: " + player.x);
-                $("#player_y").html("Player_y: " + player.y);
-                $("#obstacle_x").html("obstacle[0]_x: " + screen.obstacles[0].x);
-                $("#obstacle_y").html("obstacle[0]_y: " + screen.obstacles[0].y);
-                //console.log(player.x);
-                screen.draw()
-                player.draw()
-            }
         }
     }
 
     window.requestAnimationFrame(game_loop)
 
-    function isCollideV4(player, obstacles) {
+    function isCollide(player, obstacles, dx, dy) {
+        let newX = player.x + dx
+        let newY = player.y + dy
         isColliding = -1
         obstacles.forEach((o, i) => {
-            if (!(((player.newY + player.height) <= (o.y)) ||
-                (player.newY >= (o.y + o.height)) ||
-                ((player.newX + player.width) <= o.x) ||
-                (player.newX >= (o.x + o.width)))) { //om alla false
+            if (!(((newY + player.height) <= (o.y)) ||
+                (newY >= (o.y + o.height)) ||
+                ((newX + player.width) <= o.x) ||
+                (newX >= (o.x + o.width)))) { //om alla false
                 isColliding = i
             }
         })
-        /* if (isColliding !== -1) {
-            console.log(dir);
-            console.log(isColliding);
-            switch (dir) { //spelaren går: 
-                case "up": // upp
-                    player.y -= player.y - (obstacles[isColliding].y + obstacles[isColliding].height)
-                    break;
-                case "down": //ner
-                    console.log(player.y);
-                    player.y += obstacles[isColliding].y - (player.y + player.height)
-                    console.log(player.y);
-                    //console.log(player.y);
-                    break;
-                case "right": //höger
-                    console.log(player.x);
-                    player.x += obstacles[isColliding].x - (player.x + player.width)
-                    console.log(player.x);
-                    break;
-                case "left": //vänster
-                    player.x -= player.x - (obstacles[isColliding].x + obstacles[isColliding].width)
-                    break;
-                default:
-                    break;
-            }
-        } */
         return isColliding
     }
 
@@ -211,14 +183,10 @@ function game() {
                 player.y -= player.y - (obstacle.y + obstacle.height)
                 break;
             case "down": //ner
-                //console.log(player.y);
                 player.y += obstacle.y - (player.y + player.height)
-                //console.log(player.y);
                 break;
             case "right": //höger
-                //console.log(player.x);
                 player.x += obstacle.x - (player.x + player.width)
-                //console.log(player.x);
                 break;
             case "left": //vänster
                 player.x -= player.x - (obstacle.x + obstacle.width)
@@ -228,73 +196,13 @@ function game() {
         }
     }
 
-    function isCollideV3(player, obstacles, dirs) {
-        isColliding = -1
-        obstacles.forEach((o, i) => {
-            if (!(((player.newY + player.height) <= (o.y)) ||
-                (player.newY >= (o.y + o.height)) ||
-                ((player.newX + player.width) <= o.x) ||
-                (player.newX >= (o.x + o.width)))) { //om alla false
-                isColliding = i
-            }
-        })
-        if (isColliding !== -1) {
-            for (const dir in dirs) {
-                if (dirs[dir]) {
-                    console.log(dir);
-                    switch (dir) { //spelaren går: 
-                        case "up": // upp
-                            player.y -= player.y - (obstacles[isColliding].y + obstacles[isColliding].height)
-                            break;
-                        case "down": //ner
-                            player.y += obstacles[isColliding].y - (player.y + player.height)
-                            //console.log(player.y);
-                            break;
-                        case "right": //höger
-                            console.log(player.y);
-                            player.x += obstacles[isColliding].x - (player.x + player.width)
-                            break;
-                        case "left": //vänster
-                            player.x -= player.x - (obstacles[isColliding].x + obstacles[isColliding].width)
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
-        return isColliding
-    }
-
-    function isCollideObjects(player, obstacles) {
-        obstacles.forEach((o, i) => { //spelaren kommer från: 
-            if (player.newY + player.height > o.y && player.newY < o.y + o.height && (player.newX + player.width > o.x || player.newX < o.x + o.width)) { //ovan
-                //player.y += o.y - (player.y + player.height)
-                console.log(player.newY + player.height)
-                console.log(i, o.type)
-                return true
-            } else if (!(player.newY > o.y + o.height)) { //under
-                //player.y -= player.y - (o.y + o.height)
-                return true
-            } else if (!(player.newX + player.width < o.x)) { //vänster
-                //player.x += o.x - (player.x + player.width)
-                return true
-            } else if (!(player.newX > o.x + o.width)) { //höger
-                //player.x -= player.x - (o.x + o.width)
-                return true
-            }
-        })
-        console.log('false');
-        return false
-    }
-
     function isCollideItems(player, obstacles) {
         let isColliding = -1
         obstacles.forEach((o, index) => { //[]
-            if (!(((player.newY + player.height) < (o.y)) ||
-                (player.newY > (o.y + o.height)) ||
-                ((player.newX + player.width) < o.x) ||
-                (player.newX > (o.x + o.width)))) { //om alla false
+            if (!(((player.y + player.height) < (o.y)) ||
+                (player.y > (o.y + o.height)) ||
+                ((player.x + player.width) < o.x) ||
+                (player.x > (o.x + o.width)))) { //om alla false
                 isColliding = index
             }
         })
@@ -335,7 +243,6 @@ function game() {
                         break
                 }
                 if (change) {
-                    player.resetNewPos()
                     screen.active = false
                     console.log('n: ' + n);
                     let newScreen = screens.find((s) => { return s.number === n })
@@ -383,14 +290,7 @@ function game() {
                 console.log("space")
                 break
             case 70: //f
-                let i = isCollideItems(player, screen.items)
-                if (i !== -1 && !player.inventoryFull(screen.items[i])) {
-                    player.addItem(screen.items[i])
-                    updateInventoryHTML()
-                    screen.items.splice(i, 1)
-                    socket.emit('item taken', screen.number, i)
-                }
-                player.printInventory()
+                keys.item = true
                 break
             default:
                 break
@@ -411,6 +311,9 @@ function game() {
                 break
             case 87: //w
                 keys.up = false
+                break
+            case 70:
+                keys.item = false
                 break
             default:
                 break

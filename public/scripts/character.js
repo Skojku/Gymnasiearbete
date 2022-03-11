@@ -1,13 +1,11 @@
 class Character{
     constructor(height, width, x, y, color, username) {
-        this.height = height
-        this.width = width
+        this.height = 23 * 2.2
+        this.width = 18 * 2.2
         this.x = x
         this.y = y
         this.color = color
         this.username = username
-        this.newX = x
-        this.newY = y
         this.inventory = {}
     }
 
@@ -39,30 +37,27 @@ class Character{
         this.y = pos[1]
     }
 
-    updateOwnPosition() {
-        this.x = this.newX
-        this.y = this.newY
-    }
+    move(dx, dy) {
+        this.x += dx
+        this.y += dy
 
-    resetNewPos() {
-        this.newX = this.x
-        this.newY = this.y
     }
 
     moveX(speed) {
-        this.newX += speed
+        this.x += speed
     }
 
     moveY(speed) {
-        this.newY += speed
+        this.y += speed
     }
 
     draw() {
-        ctx.fillStyle = this.color
+        ctx.drawImage(playersheet, 2, 3, 18, 23, this.x, this.y, this.width, this.height)
+        /* ctx.fillStyle = this.color
         ctx.font = "20px Comic Sans MS"
         let x = (this.username.length*10)/2
         ctx.fillText(this.username, this.x-x+(this.width/2), this.y-2)
-        ctx.fillRect(this.x, this.y, this.width, this.height)
+        ctx.fillRect(this.x, this.y, this.width, this.height) */
     }
 
     createCharacter(json) {
@@ -72,8 +67,6 @@ class Character{
         this.y = json.y
         this.color = json.color
         this.username = json.username
-        this.newX = json.x
-        this.newY = json.y
         this.inventory = []
     }
 }
