@@ -1,5 +1,5 @@
 class Character{
-    constructor(height, width, x, y, color, username) {
+    constructor(x, y, color, username) {
         this.height = 23 * 2.2
         this.width = 18 * 2.2
         this.x = x
@@ -9,9 +9,9 @@ class Character{
         this.inventory = {}
         this.dir = 's'
         this.walking = 0
-        this.hitBox = {
-            width: 40,
-            height: 40
+        this.hitbox = {
+            width: 35,
+            height: 45
         }
     }
 
@@ -69,29 +69,29 @@ class Character{
     }
 
     draw() {
-        //ctx.drawImage(playersheet, 2, 3, 18, 23, this.x, this.y, this.width, this.height)
-        let x
-        let y
-        let width
-        let height
+        let x_image, y_image, width, height
         if (this.walking === 0) {
-            x = playersheet_pos.standing[this.dir][0]
-            y = playersheet_pos.standing[this.dir][1]
+            x_image = playersheet_pos.standing[this.dir][0]
+            y_image = playersheet_pos.standing[this.dir][1]
             width = playersheet_pos.standing[this.dir][2]
             height = playersheet_pos.standing[this.dir][3]
         } else {
-            x = playersheet_pos.walking[this.dir][0]
-            y = playersheet_pos.walking[this.dir][1]
-            width = playersheet_pos.walking[this.dir][2]
-            height = playersheet_pos.walking[this.dir][3]
+            x_image = playersheet_pos.walking[this.dir][this.walking][0]
+            y_image = playersheet_pos.walking[this.dir][this.walking][1]
+            width = playersheet_pos.walking[this.dir][this.walking][2]
+            height = playersheet_pos.walking[this.dir][this.walking][3]
         }
-
+        
         let ratio = 50/height < 50/width ? 50/height : 50/width
         this.width = width*ratio
         this.height = height*ratio
-        //console.log(this.width);
-        //console.log(this.height);
-        ctx.drawImage(playersheet, x, y, width, height, this.x, this.y, this.width, this.height)
+        let x = this.x - (this.width - this.hitbox.width)/2
+        let y = this.y - (this.height - this.hitbox.height)/2
+        ctx.drawImage(playersheet, x_image, y_image, width, height, x, y, this.width, this.height)
+
+        ctx.font = '20px Comic Sans MS'
+        ctx.fillStyle = this.color
+        ctx.fillText(this.username, x - (this.username.length*10 - this.width)/2, this.y-5)
     }
 
     createCharacter(json) {

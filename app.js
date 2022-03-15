@@ -169,10 +169,10 @@ io.on('connection', (socket) => {
         console.log('pong')
     })
 
-    socket.on('position', (pos) => { //uppdatera position och skicka till andra
+    socket.on('position', (pos, dir, walking) => { //uppdatera position och skicka till andra
         socket.user.pos = pos
         //console.log(socket.user.username)
-        socket.broadcast.emit('position', socket.user)
+        socket.broadcast.emit('position', socket.user, dir, walking)
     })
 
     socket.on('change_screen', (screen, newScreen) => { //uppdatera skärm och skicka till andra
@@ -180,6 +180,11 @@ io.on('connection', (socket) => {
         //console.log(socket.user.username + " screeeeen");
         socket.broadcast.emit('change_screen', screen, newScreen, socket.user.username)
     })
+
+    socket.on('player_standing', () => {
+        socket.broadcast.emit('player_standing', socket.user)
+    }) 
+    
 
     socket.on('item taken', (screen_nr, item_index) => {
         socket.broadcast.emit('item taken', screen_nr, item_index)

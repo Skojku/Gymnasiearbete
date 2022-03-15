@@ -20,7 +20,7 @@ function game() {
         a: false,
         d: false,
         w: false,
-        s: true
+        s: false
     }
 
     $.get("/world_file", (data) => {
@@ -42,9 +42,9 @@ function game() {
         //console.log(characters2);
         characters2.forEach(c => {
             if (user.username === c.username) {
-                player = new Character(50, 50, user.pos[0], user.pos[1], 'green', user.username)
+                player = new Character(user.pos[0], user.pos[1], 'green', user.username)
             } else {
-                let newCharacter = new Character(50, 50, c.pos[0], c.pos[1], 'blue', c.username)
+                let newCharacter = new Character(c.pos[0], c.pos[1], 'blue', c.username)
                 newCharacter.draw()
                 screens[c.screen].characters.push(newCharacter)
             }
@@ -52,19 +52,31 @@ function game() {
     })
 
     socket.on('new_character', (user) => {
-        //screens.find((s1) => { return s1.number === s }).characters.push(new Character(50, 50, pos[0], pos[1], 'green', username))
-        screens[user.screen].characters.push(new Character(50, 50, user.pos[0], user.pos[1], 'blue', user.username))
+        //screens.find((s1) => { return s1.number === s }).characters.push(new Character(pos[0], pos[1], 'green', username))
+        screens[user.screen].characters.push(new Character(user.pos[0], user.pos[1], 'blue', user.username))
     })
 
     socket.on('remove_character', (user) => {
         screens[user.screen].characters.splice(screens[user.screen].characters.indexOf(screens[user.screen].characters.find((c) => { return c.username === user.username })), 1)
     })
 
-    socket.on('position', (user) => { //ändra andras position
+    socket.on('position', (user, dir, walking) => { //ändra andras position
         //console.log(screens[user.screen]);
+        let characters = screens[user.screen].characters
+        for (let i = 0; i < characters.length; i++) {
+            if (user.username === characters[i].username) {
+                characters[i].updatePosition(user.pos)
+                characters[i].dir = dir
+                characters[i].walking = walking
+            }
+        }
+    })
+
+    socket.on('player_standing', (user) => {
+        console.log(user.screen);
         screens[user.screen].characters.forEach(c => {
-            if (user.username === c.username) {
-                c.updatePosition(user.pos)
+            if (c.username === user.username) {
+                c.stand()
             }
         })
     })
@@ -98,6 +110,7 @@ function game() {
     })
 
     let previous_timestamp
+    let counter = 0
     function game_loop(timestamp) {
         window.requestAnimationFrame(game_loop)
         if (!previous_timestamp) {
@@ -105,6 +118,7 @@ function game() {
         }
         const dt = (timestamp - previous_timestamp) / 1000
         previous_timestamp = timestamp
+
         ctx.clearRect(0, 0, canvas.width, canvas.height) //clear canvas
         if (player) { //om player är loadad
             let dx = 0
@@ -127,7 +141,7 @@ function game() {
                 moving = true
             }
             if (keys.item) {
-                let i = isCollideItems(player, screen.items)
+                let i = isCollide(player, screen.items, dx, dy)
                 if (i !== -1 && !player.inventoryFull(screen.items[i])) {
                     player.addItem(screen.items[i])
                     updateInventoryHTML()
@@ -137,6 +151,12 @@ function game() {
                 player.printInventory()
             }
             if (moving) {
+                if (counter === 8) {
+                    counter = 0
+                    player.walk()
+                } else {
+                    counter++
+                }
                 if (isCollide(player, screen.obstacles, dx, dy) !== -1) {
                     if (dx > 0 && isCollide(player, screen.obstacles, dx, 0) !== -1) {
                         moveToObstacle(screen.obstacles[isCollide(player, screen.obstacles, dx, 0)], 'right')
@@ -152,7 +172,7 @@ function game() {
                 else {
                     player.move(dx, dy)
                 }
-                socket.emit('position', [player.x, player.y])
+                socket.emit('position', [player.x, player.y], player.dir, player.walking)
             }
             checkIfNewScreen()
             $("#screen_nr").html("Screen: " + screen.number);
@@ -203,19 +223,6 @@ function game() {
         }
     }
 
-    function isCollideItems(player, obstacles) {
-        let isColliding = -1
-        obstacles.forEach((o, index) => { //[]
-            if (!(((player.y + player.height) < (o.y)) ||
-                (player.y > (o.y + o.height)) ||
-                ((player.x + player.width) < o.x) ||
-                (player.x > (o.x + o.width)))) { //om alla false
-                isColliding = index
-            }
-        })
-        return isColliding
-    }
-
     function checkIfNewScreen() {
         screen.nextScreens.forEach((n, i) => {
             if (n != -1) {
@@ -223,24 +230,24 @@ function game() {
                 switch (i) {
                     case 0:
                         if (player.x < 0) { //vänster
-                            player.x = canvas.width - player.width
+                            player.x = canvas.width - player.hitbox.width
                             change = true
                         }
                         break
                     case 1:
                         if (player.y < 0) { //upp
-                            player.y = canvas.height - player.height
+                            player.y = canvas.height - player.hitbox.height
                             change = true
                         }
                         break
                     case 2:
-                        if (player.x + player.width > canvas.width) { //höger
+                        if (player.x + player.hitbox.width > canvas.width) { //höger
                             player.x = 0
                             change = true
                         }
                         break
                     case 3:
-                        if (player.y + player.height > canvas.height) { //ner
+                        if (player.y + player.hitbox.height > canvas.height) { //ner
                             player.y = 0
                             change = true
                         }
@@ -251,7 +258,7 @@ function game() {
                 }
                 if (change) {
                     screen.active = false
-                    console.log('n: ' + n);
+                    //console.log('n: ' + n);
                     let newScreen = screens.find((s) => { return s.number === n })
                     socket.emit("change_screen", screen.number, newScreen.number)
                     screens[screens.indexOf(newScreen)].active = true
@@ -281,6 +288,20 @@ function game() {
             if (dirs[dir]) {
                 player.dir = dir
             }
+        }
+    }
+
+    function checkIfStanding() {
+        let moving = false
+        for (const key in keys) {
+            if (keys[key]) {
+                moving = true
+            }
+        }
+
+        if (!moving) {
+            player.stand()
+            socket.emit('player_standing')
         }
     }
 
@@ -346,5 +367,6 @@ function game() {
                 break
         }
         checkDir()
+        checkIfStanding()
     })
 }
