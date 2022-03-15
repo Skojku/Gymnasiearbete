@@ -16,6 +16,13 @@ function game() {
         item: false,
     }
 
+    var dirs = {
+        a: false,
+        d: false,
+        w: false,
+        s: true
+    }
+
     $.get("/world_file", (data) => {
         data.forEach(s => {
             screens.push(Screen.from(s))
@@ -167,9 +174,9 @@ function game() {
         let newY = player.y + dy
         isColliding = -1
         obstacles.forEach((o, i) => {
-            if (!(((newY + player.height) <= (o.y)) ||
+            if (!(((newY + player.hitbox.height) <= (o.y)) ||
                 (newY >= (o.y + o.height)) ||
-                ((newX + player.width) <= o.x) ||
+                ((newX + player.hitbox.width) <= o.x) ||
                 (newX >= (o.x + o.width)))) { //om alla false
                 isColliding = i
             }
@@ -183,10 +190,10 @@ function game() {
                 player.y -= player.y - (obstacle.y + obstacle.height)
                 break;
             case "down": //ner
-                player.y += obstacle.y - (player.y + player.height)
+                player.y += obstacle.y - (player.y + player.hitbox.height)
                 break;
             case "right": //höger
-                player.x += obstacle.x - (player.x + player.width)
+                player.x += obstacle.x - (player.x + player.hitbox.width)
                 break;
             case "left": //vänster
                 player.x -= player.x - (obstacle.x + obstacle.width)
@@ -269,21 +276,37 @@ function game() {
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
+    function checkDir() {
+        for (const dir in dirs) {
+            if (dirs[dir]) {
+                player.dir = dir
+            }
+        }
+    }
+
     $(window).keydown((e) => {
         let key = e.which
         //console.log(key)
         switch (key) {
             case 65: //a
                 keys.left = true
+                dirs.a = true
+                player.dir = 'a'
                 break
             case 68: //d
                 keys.right = true
+                dirs.d = true
+                player.dir = 'd'
                 break
             case 83: //s
                 keys.down = true
+                dirs.s = true
+                player.dir = 's'
                 break
             case 87: //w
                 keys.up = true
+                dirs.w = true
+                player.dir = 'w'
                 break
             case 32: //space
                 e.preventDefault()
@@ -302,15 +325,19 @@ function game() {
         switch (key) {
             case 65: //a
                 keys.left = false
+                dirs.a = false
                 break
             case 68: //d
                 keys.right = false
+                dirs.d = false
                 break
             case 83: //s
                 keys.down = false
+                dirs.s = false
                 break
             case 87: //w
                 keys.up = false
+                dirs.w = false
                 break
             case 70:
                 keys.item = false
@@ -318,5 +345,6 @@ function game() {
             default:
                 break
         }
+        checkDir()
     })
 }

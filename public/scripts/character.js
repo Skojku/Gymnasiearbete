@@ -7,6 +7,12 @@ class Character{
         this.color = color
         this.username = username
         this.inventory = {}
+        this.dir = 's'
+        this.walking = 0
+        this.hitBox = {
+            width: 40,
+            height: 40
+        }
     }
 
     inventoryFull(item) {
@@ -40,7 +46,6 @@ class Character{
     move(dx, dy) {
         this.x += dx
         this.y += dy
-
     }
 
     moveX(speed) {
@@ -51,13 +56,42 @@ class Character{
         this.y += speed
     }
 
+    walk() {
+        if (this.walking == 10) {
+            this.walking = 0
+        } else {
+            this.walking++
+        }
+    }
+
+    stand() {
+        this.walking = 0
+    }
+
     draw() {
-        ctx.drawImage(playersheet, 2, 3, 18, 23, this.x, this.y, this.width, this.height)
-        /* ctx.fillStyle = this.color
-        ctx.font = "20px Comic Sans MS"
-        let x = (this.username.length*10)/2
-        ctx.fillText(this.username, this.x-x+(this.width/2), this.y-2)
-        ctx.fillRect(this.x, this.y, this.width, this.height) */
+        //ctx.drawImage(playersheet, 2, 3, 18, 23, this.x, this.y, this.width, this.height)
+        let x
+        let y
+        let width
+        let height
+        if (this.walking === 0) {
+            x = playersheet_pos.standing[this.dir][0]
+            y = playersheet_pos.standing[this.dir][1]
+            width = playersheet_pos.standing[this.dir][2]
+            height = playersheet_pos.standing[this.dir][3]
+        } else {
+            x = playersheet_pos.walking[this.dir][0]
+            y = playersheet_pos.walking[this.dir][1]
+            width = playersheet_pos.walking[this.dir][2]
+            height = playersheet_pos.walking[this.dir][3]
+        }
+
+        let ratio = 50/height < 50/width ? 50/height : 50/width
+        this.width = width*ratio
+        this.height = height*ratio
+        //console.log(this.width);
+        //console.log(this.height);
+        ctx.drawImage(playersheet, x, y, width, height, this.x, this.y, this.width, this.height)
     }
 
     createCharacter(json) {
