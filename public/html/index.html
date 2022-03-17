@@ -34,6 +34,7 @@
                 <h2>Users: </h2>
                 <ul id="users"></ul>
                 <button class="btn btn-dark" id="logout">Logout</button>
+                <button class="btn btn-outline-dark" id="delete">Delete account</button>
             </div>
             <div class="col">
                 <p id="screen_nr">Screen: </p>
@@ -112,7 +113,7 @@
         var socket
         var username
         let promise = new Promise((resolve) => {
-            $.get("/user", (u) => {
+            $.get("/username", (u) => {
                 resolve(u)
                 //console.log(u + " 1")
             })

@@ -5,7 +5,8 @@ const server = http.createServer(app)
 const { Server } = require('socket.io')
 const io = new Server(server)
 const session = require('express-session')
-const db = require('./database')
+const db_handler = require('./db_handler')
+const md5 = require('md5')
 
 const fs = require('fs')
 
@@ -18,7 +19,7 @@ var online_users = []
 //x fixa items och inventory
 //x BÄTTRE COLLISION
 //x fixa sprites
-// databas
+// databas --fixa delete funktionalitet
 // fixa f5 
 
 var req1
@@ -31,8 +32,6 @@ app.use(session({
     resave: true,
     saveUninitialized: false
 }))
-
-app.use("/api", db) //database routes
 
 // --------routes----------
 
@@ -76,13 +75,23 @@ app.post('/update_world', (req, res) => {
     fs.writeFileSync("world_file.json", JSON.stringify(req.body, null, 4))
 })
 
-app.get('/user', (req, res) => {
+app.get('/username', (req, res) => {
     if (req.session.loggedIn) {
         //console.log(req.session.username)
         res.send(req.session.username)
     } else {
         res.redirect('/')
     }
+})
+
+app.get('/users', (req, res) => {
+    db_handler.get_all_users()
+        .then(response => {
+            console.log(response)
+        })
+        .catch(error => {
+            console.log(error)
+        })
 })
 
 app.get('/create_user', (req, res) => {
@@ -102,30 +111,53 @@ app.post('/login', (req, res) => {
         console.log('login unsuccessful')
     }
     let login = false
-    users.forEach(u => {
-        if (user.username === u.username && user.password === u.password) {
-            console.log('login successful')
-            req1.session.username = user.username
-            req.session.loggedIn = true
-            login = true
-            if (user.editor === "on") {
-                res.redirect('/editor')
-            } else {
-                res.redirect('/game')
+
+    db_handler.get_all_users()
+        .then(users => {
+            users.forEach(u => {
+                if (user.username === u.name && md5(user.password) === u.password) {
+                    console.log('login successful')
+                    req1.session.username = user.username
+                    req.session.loggedIn = true
+                    login = true
+                    if (user.editor === "on") {
+                        res.redirect('/editor')
+                    } else {
+                        res.redirect('/game')
+                    }
+                }
+            })
+            if (!login) {
+                res.redirect('/')
+                console.log('no matching user')
             }
-        }
-    })
-    if (!login) {
-        res.redirect('/')
-        console.log('no matching user')
-    }
+        })
+        .catch(error => {
+            res.redirect('/')
+            console.log(error);
+        })
+})
+
+app.post('/create_user', (req, res) => {
+    let username = req.body.username
+    let password = req.body.password
+    let password2 = req.body.password2
+    db_handler.create_user(username, password, password2)
+        .then(response => {
+            console.log(response)
+            res.redirect('/')
+        })
+        .catch(error => {
+            console.log(error)
+            res.redirect('/create_user')
+        })
 })
 
 // -----------socket shit------------
 
 io.on('connection', (socket) => {
     if (req1) {
-        user = {
+        let user = {
             username: req1.session.username,
             pos: [200, 100],
             screen: 0

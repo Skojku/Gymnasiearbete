@@ -12,14 +12,15 @@
 
 <body>
     <div class="container" id="login_div">
-        <form action="/api/user" method="post">
+        <form action="/create_user" method="post">
             <h1>Create User</h1>
             <input type="text" name="username" placeholder="Username" class="form-control">
             <input type="password" name="password" placeholder="Password" class="form-control mt-3">
-            <input type="password" name="password2" placeholder="Confirm password" class="form-control mt-1">
+            <input type="password" name="password2" placeholder="Confirm Password" class="form-control mt-1">
             <button type="submit" id="login" class="btn btn-primary mt-3">Submit</button>
         </form>
     </div>
+    <ul id="error_msg"></ul>
 </body>
 
 </html>
