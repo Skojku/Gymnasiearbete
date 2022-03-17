@@ -151,7 +151,7 @@ function game() {
                 player.printInventory()
             }
             if (moving) {
-                if (counter === 8) {
+                if (counter === 5) {
                     counter = 0
                     player.walk()
                 } else {
