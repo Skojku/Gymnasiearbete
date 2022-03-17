@@ -5,6 +5,7 @@ const server = http.createServer(app)
 const { Server } = require('socket.io')
 const io = new Server(server)
 const session = require('express-session')
+const db = require('./database')
 
 const fs = require('fs')
 
@@ -30,6 +31,8 @@ app.use(session({
     resave: true,
     saveUninitialized: false
 }))
+
+app.use("/api", db) //database routes
 
 // --------routes----------
 
@@ -80,6 +83,10 @@ app.get('/user', (req, res) => {
     } else {
         res.redirect('/')
     }
+})
+
+app.get('/create_user', (req, res) => {
+    res.sendFile(__dirname + '/public/html/create_user.html')
 })
 
 app.post('/logout', (req, res) => {
@@ -183,8 +190,8 @@ io.on('connection', (socket) => {
 
     socket.on('player_standing', () => {
         socket.broadcast.emit('player_standing', socket.user)
-    }) 
-    
+    })
+
 
     socket.on('item taken', (screen_nr, item_index) => {
         socket.broadcast.emit('item taken', screen_nr, item_index)

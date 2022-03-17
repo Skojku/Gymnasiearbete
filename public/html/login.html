@@ -23,7 +23,12 @@
             </div>
             <button type="submit" id="login" class="btn btn-primary">Login</button>
         </form>
+        <button class="btn btn-secondary" id="create_user">Create User</button>
     </div>
 </body>
-
+<script>
+    $("#create_user").click(() => { 
+        window.location.replace('/create_user')
+    })
+</script>
 </html>
