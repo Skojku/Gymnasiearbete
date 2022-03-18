@@ -8,13 +8,34 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
         console.error(err.message)
         throw err
     } else {
-        console.log('Created database.')
-        db.run('DROP TABLE IF EXISTS user')
+        //console.log('0');
+        //db.run('DROP TABLE IF EXISTS user')
         db.run(`CREATE TABLE IF NOT EXISTS user (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name text UNIQUE, 
-            password text)`
+            password text,
+            screen INTEGER DEFAULT 1 NOT NULL, 
+            x DOUBLE DEFAULT 200 NOT NULL,
+            y DOUBLE DEFAULT 100 NOT NULL)`
         );
-        db.run(`INSERT INTO user (name, password) VALUES ("johan","202cb962ac59075b964b07152d234b70")`)
+
+        //db.run('DROP TABLE IF EXISTS item')
+        db.run(`CREATE TABLE IF NOT EXISTS item (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            type TEXT)`
+        ); 
+        
+        //db.run('DROP TABLE IF EXISTS hasitem')
+        db.run(`CREATE TABLE IF NOT EXISTS hasitem (
+            spelarid INTEGER,
+            itemid INTEGER, 
+            count INTEGER)`
+        );
+
+        console.log('Created database.')
+        let insert = 'INSERT INTO item (type) VALUES '
+        /* db.run(insert + '("rock")')
+        db.run(insert + '("torch")')
+        db.run(insert + '("brick")') */
     }
 });

@@ -21,6 +21,7 @@ var online_users = []
 //x fixa sprites
 // databas --fixa delete funktionalitet
 // fixa f5 
+// lägg till items i editor
 
 var req1
 
@@ -153,6 +154,11 @@ app.post('/create_user', (req, res) => {
         })
 })
 
+app.put('/products', (req, res) => {
+    const { id, name, description } = req.body;
+    res.send(`Name ${id} ${name}, desc ${description}`);
+});
+
 // -----------socket shit------------
 
 io.on('connection', (socket) => {
@@ -160,7 +166,8 @@ io.on('connection', (socket) => {
         let user = {
             username: req1.session.username,
             pos: [200, 100],
-            screen: 0
+            screen: 0,
+            inventory: {}
         }
         socket.user = user
         console.log('a user connected')
@@ -196,12 +203,17 @@ io.on('connection', (socket) => {
     }
 
     socket.on('disconnect', (reason) => {
+        io.emit("disconnected", {customEvent: 'Custom Message'})
         online_users.splice(online_users.indexOf(socket.user), 1)
         console.log('a user disconnected because of ' + reason)
         console.log("------online_users------")
         console.log(online_users)
         io.emit("active_users", online_users.map(u => { return u.username }))
         io.emit("remove_character", socket.user)
+    })
+
+    socket.on('test', () => {
+        console.log('test');
     })
 
     socket.on("pong", () => {

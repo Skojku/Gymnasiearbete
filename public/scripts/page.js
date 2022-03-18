@@ -9,6 +9,11 @@ function page() {
         })
     })
 
+    socket.io.on('disconnected', () => {
+        console.log('test');
+        socket.emit('test')
+    })
+
     socket.on('connect', () => {
         console.log("connected")
     })

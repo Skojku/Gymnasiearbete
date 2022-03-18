@@ -3,7 +3,7 @@ const router = express.Router()
 const sqlite3 = require('sqlite3').verbose()
 const md5 = require('md5')
 
-const DBSOURCE = "db.sqlite"
+const DBSOURCE = "db2.sqlite"
 
 router.use(express.urlencoded({ extended: false }))
 
@@ -69,6 +69,19 @@ async function create_user(username, password, password2) {
     return await myPromise
 }
 
+async function update_user(user) {
+    var sql_user = `UPDATE user SET x = ?, y = ?, screen = ? WHERE name = ?` 
+    let myPromise = new Promise((resolve, reject) => {
+        db.run(sql_user, [x, y, screen, user.username], (err, result) => {
+            if (err) {
+                reject({ "error": err.message })
+            }
+            resolve('User updated')
+        })
+    })
+
+    return await myPromise
+}
 
 async function user_in_db(user) {
     let myPromise = new Promise((resolve, reject) => {
