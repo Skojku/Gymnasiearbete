@@ -1,11 +1,11 @@
 class Character{
-    constructor(x, y, color, username) {
+    constructor(x, y, color, name) {
         this.height = 23 * 2.2
         this.width = 18 * 2.2
         this.x = x
         this.y = y
         this.color = color
-        this.username = username
+        this.name = name
         this.inventory = {}
         this.dir = 's'
         this.walking = 0
@@ -16,8 +16,8 @@ class Character{
     }
 
     inventoryFull(item) {
-        if (item.type in this.inventory) {
-            if (item.stack_size == this.inventory[item.type]) {
+        if (item.itemtype in this.inventory) {
+            if (item.stack_size == this.inventory[item.itemtype]) {
                 return true
             }
         }
@@ -25,10 +25,10 @@ class Character{
     }
 
     addItem(i) {
-        if (i.type in this.inventory) {
-            this.inventory[i.type]++
+        if (i.itemtype in this.inventory) {
+            this.inventory[i.itemtype]++
         } else {
-            this.inventory[i.type] = 1
+            this.inventory[i.itemtype] = 1
         }
     }
 
@@ -91,7 +91,7 @@ class Character{
 
         ctx.font = '20px Comic Sans MS'
         ctx.fillStyle = this.color
-        ctx.fillText(this.username, x - (this.username.length*10 - this.width)/2, this.y-5)
+        ctx.fillText(this.name, x - (this.name.length*10 - this.width)/2, this.y-5)
     }
 
     createCharacter(json) {
@@ -100,7 +100,7 @@ class Character{
         this.x = json.x
         this.y = json.y
         this.color = json.color
-        this.username = json.username
+        this.name = json.name
         this.inventory = []
     }
 }

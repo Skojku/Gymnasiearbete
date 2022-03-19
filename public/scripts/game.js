@@ -3,10 +3,7 @@ function game() {
     canvas.height = 500
     canvas.width = 500
 
-    var player
-
     var screens = []
-    var screen
 
     var keys = {
         up: false,
@@ -41,10 +38,13 @@ function game() {
         })
         //console.log(characters2);
         characters2.forEach(c => {
-            if (user.username === c.username) {
-                player = new Character(user.pos[0], user.pos[1], 'green', user.username)
+            if (user.id === c.id) {
+                player = new Character(user.x, user.y, 'green', user.name)
+                console.log(user)
+                player.inventory = user.inventory
+                updateInventoryHTML()
             } else {
-                let newCharacter = new Character(c.pos[0], c.pos[1], 'blue', c.username)
+                let newCharacter = new Character(c.x, c.y, 'blue', c.name)
                 newCharacter.draw()
                 screens[c.screen].characters.push(newCharacter)
             }
@@ -52,19 +52,19 @@ function game() {
     })
 
     socket.on('new_character', (user) => {
-        //screens.find((s1) => { return s1.number === s }).characters.push(new Character(pos[0], pos[1], 'green', username))
-        screens[user.screen].characters.push(new Character(user.pos[0], user.pos[1], 'blue', user.username))
+        //screens.find((s1) => { return s1.number === s }).characters.push(new Character(x, y, 'green', name))
+        screens[user.screen].characters.push(new Character(user.x, user.y, 'blue', user.name))
     })
 
     socket.on('remove_character', (user) => {
-        screens[user.screen].characters.splice(screens[user.screen].characters.indexOf(screens[user.screen].characters.find((c) => { return c.username === user.username })), 1)
+        screens[user.screen].characters.splice(screens[user.screen].characters.indexOf(screens[user.screen].characters.find((c) => { return c.name === user.name })), 1)
     })
 
     socket.on('position', (user, dir, walking) => { //ändra andras position
         //console.log(screens[user.screen]);
         let characters = screens[user.screen].characters
         for (let i = 0; i < characters.length; i++) {
-            if (user.username === characters[i].username) {
+            if (user.name === characters[i].name) {
                 characters[i].updatePosition(user.pos)
                 characters[i].dir = dir
                 characters[i].walking = walking
@@ -75,7 +75,7 @@ function game() {
     socket.on('player_standing', (user) => {
         console.log(user.screen);
         screens[user.screen].characters.forEach(c => {
-            if (c.username === user.username) {
+            if (c.name === user.name) {
                 c.stand()
             }
         })
@@ -110,7 +110,7 @@ function game() {
     })
 
     let previous_timestamp
-    let counter = 0
+    let counter = 0 //counter för att veta när man ska ändra animationssteg
     function game_loop(timestamp) {
         window.requestAnimationFrame(game_loop)
         if (!previous_timestamp) {
@@ -148,7 +148,7 @@ function game() {
                     screen.items.splice(i, 1)
                     socket.emit('item taken', screen.number, i)
                 }
-                player.printInventory()
+                //player.printInventory()
             }
             if (moving) {
                 if (counter === 5) {
@@ -274,8 +274,8 @@ function game() {
 
     function updateInventoryHTML() {
         $("#inventory").empty();
-        for (const type in player.inventory) {
-            $("#inventory").append(`<li>${capitalizeFirstLetter(type)} ${player.inventory[type]}</li>`)
+        for (const itemtype in player.inventory) {
+            $("#inventory").append(`<li>${capitalizeFirstLetter(itemtype)} ${player.inventory[itemtype]}</li>`)
         }
     }
 

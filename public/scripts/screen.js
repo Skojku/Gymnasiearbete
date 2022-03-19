@@ -74,7 +74,7 @@ class Screen {
             s.obstacles.push(new Obstacle(o.width, o.height, o.x, o.y, o.type))
         })
         json.items.forEach(i => {
-            s.items.push(new Item(i.width, i.height, i.x, i.y, i.type))
+            s.items.push(new Item(i.width, i.height, i.x, i.y, i.itemtype))
         })
         s.characters = []
         //console.log('sssssssssss');

@@ -1,8 +1,8 @@
 class Item extends Collision_base{
-    constructor(height, width, x, y, type) {
+    constructor(height, width, x, y, itemtype) {
         super(height, width, x, y)
-        this.type = type
-        switch (type) {
+        this.itemtype = itemtype
+        switch (itemtype) {
             case "rock":
                 this.color = "#727080"
                 this.stack_size = 3

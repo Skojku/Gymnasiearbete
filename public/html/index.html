@@ -112,6 +112,8 @@
         }
         var socket
         var username
+        var player
+        var screen
         let promise = new Promise((resolve) => {
             $.get("/username", (u) => {
                 resolve(u)

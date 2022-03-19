@@ -120,28 +120,35 @@
                 "width": 20,
                 "x": 100,
                 "y": 50,
-                "type": "rock"
+                "itemtype": "rock"
             },
             {
                 "height": 20,
                 "width": 20,
                 "x": 200,
                 "y": 50,
-                "type": "rock"
+                "itemtype": "rock"
             },
             {
                 "height": 20,
                 "width": 20,
                 "x": 100,
                 "y": 100,
-                "type": "rock"
+                "itemtype": "rock"
             },
             {
                 "height": 20,
                 "width": 20,
                 "x": 200,
                 "y": 100,
-                "type": "rock"
+                "itemtype": "rock"
+            },
+            {
+                "height": 20,
+                "width": 20,
+                "x": 300,
+                "y": 100,
+                "itemtype": "brick"
             }
         ],
         "characters": [],
