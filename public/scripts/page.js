@@ -1,7 +1,7 @@
 function page() {
     var active_users = []
 
-    $("#logout").click(() => { 
+    $("#logout").click(() => {
         console.log(player);
         let data = {
             screen: screen.number,
@@ -32,7 +32,7 @@ function page() {
             x: player.x,
             y: player.y,
             inventory: player.inventory
-        } 
+        }
         $.ajax({
             type: "PUT",
             url: "/update_user",
@@ -56,6 +56,7 @@ function page() {
     socket.on("active_users", (users) => {
         //console.log('active users')
         active_users = users
+        console.log(active_users);
         printUsers()
     })
 
@@ -69,17 +70,13 @@ function page() {
         socket.disconnect()
         $.post("/logout")
         window.location.replace('/')
-    }) 
+    })
 
     function printUsers() {
         $("#users").empty()
-        //console.log(username)
+        // console.log(username)
         active_users.forEach(user => {
-            if (user === username) {
-                $("#users").append(`<li>${user} (you)</li>`)
-            } else {
-                $("#users").append(`<li>${user}</li>`)
-            }
+            $("#users").append(`<li>${user}</li>`)
         })
     }
 }

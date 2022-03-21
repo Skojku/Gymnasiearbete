@@ -32,6 +32,17 @@ class Character{
         }
     }
 
+    throwItem(i) {
+        let type = i.itemtype
+        // console.log(type);
+        // console.log(this.inventory[type]);
+        if (this.inventory[type] === 1) {
+            delete this.inventory[type]
+        } else {
+            this.inventory[type]--
+        }
+    }
+
     printInventory() {
         for (const key in this.inventory) {
             console.log(key + " " + this.inventory[key]);

@@ -11,7 +11,7 @@ const md5 = require('md5')
 const fs = require('fs')
 
 const { randomBytes } = require('crypto')
-var online_users = []
+var online_users = {}
 var items = {}
 
 // --------TODO---------
@@ -19,8 +19,9 @@ var items = {}
 //x fixa items och inventory
 //x BÄTTRE COLLISION
 //x fixa sprites
+//x fixa att man inte kan logga in som samma karaktär
+// fixa f5 --
 // databas --fixa delete funktionalitet
-// fixa f5 --fixa så att items inte respawnar hos klienten
 // lägg till items i editor
 
 var req1
@@ -33,6 +34,17 @@ app.use(session({
     resave: true,
     saveUninitialized: false
 }))
+
+//spara items på servern istället för hos klienten
+fs.readFile('world_file.json', (err, data) => {
+    if (err) {
+        console.error(err)
+        return
+    }
+    JSON.parse(data).forEach(d => { 
+        items[d.number] = d.items
+    })
+})
 
 // --------routes----------
 
@@ -59,11 +71,14 @@ app.get('/world_file', (req, res) => {
             console.error(err)
             return
         }
-        JSON.parse(data).forEach(d => { //spara items på servern istället för hos klienten
-            items[d.number] = d.items
-        })
+        // console.log(JSON.parse(data));
+        let out = JSON.parse(data)
+        for (let i = 0; i < out.length; i++) {
+            out[i].items = items[i] //byt ut items från world_file till items från servern
+        }
+        // console.log(out);
         res.setHeader('Content-Type', 'application/json')
-        res.send(data)
+        res.send(JSON.stringify(out))
     })
 })
 
@@ -152,47 +167,57 @@ app.post('/login', (req, res) => {
 
     db_handler.get_all_users()
         .then(users => {
+            let alreadyLoggedIn
             users.forEach(u => {
                 if (loginuser.username === u.name && md5(loginuser.password) === u.password) {
-                    console.log('login successful')
-                    req.session.id = u.id
-                    req.session.loggedIn = true
-                    if (loginuser.editor === "on") {
-                        res.redirect('/editor')
-                    } else {
-                        req1.session.user = {
-                            id: u.id,
-                            name: u.name,
-                            screen: u.screen,
-                            x: u.x,
-                            y: u.y
-                        }
-
-                        db_handler.get_inventory_by_userid(u.id)
-                            .then(respons => {
-                                // console.log('inventory');
-                                // console.log(respons);
-                                req1.session.user.inventory = {}
-                                respons.forEach(i => {
-                                    req1.session.user.inventory[i["itemtype"]] = i["count"]
+                    if (!(u.id in online_users)) {
+                        console.log('login successful')
+                        req.session.id = u.id
+                        req.session.loggedIn = true
+                        if (loginuser.editor === "on") {
+                            res.redirect('/editor')
+                        } else {
+                            req1.session.user = {
+                                id: u.id,
+                                name: u.name,
+                                screen: u.screen,
+                                x: u.x,
+                                y: u.y
+                            }
+    
+                            db_handler.get_inventory_by_userid(u.id)
+                                .then(respons => {
+                                    // console.log('inventory');
+                                    // console.log(respons);
+                                    req1.session.user.inventory = {}
+                                    respons.forEach(i => {
+                                        req1.session.user.inventory[i["itemtype"]] = i["count"]
+                                    })
+                                    // console.log('user');
+                                    // console.log(req1.session.user.inventory);
+                                    res.redirect('/game')
                                 })
-                                // console.log('user');
-                                // console.log(req1.session.user.inventory);
-                                res.redirect('/game')
-                            })
-                            .catch(error => {
-                                console.log(error)
-                                res.redirect('/')
-                            })
+                                .catch(error => {
+                                    console.log(error)
+                                    res.redirect('/')
+                                })
+                        }
+                    } else {
+                        alreadyLoggedIn = true
                     }
                 }
             })
-            if (!req.session.loggedIn) {
+            if (alreadyLoggedIn) {
+                console.log('User already logged in')
+                res.redirect('/')
+            }
+            else if (!req.session.loggedIn) {
                 res.redirect('/')
                 console.log('no matching user')
             }
         })
         .catch(error => {
+            console.log('oj');
             res.redirect('/')
             console.log(error);
         })
@@ -221,10 +246,14 @@ io.on('connection', (socket) => {
         socket.user = req1.session.user
         //(socket.user);
         console.log('a user connected')
-        online_users.push(socket.user)
+        // online_users.push(socket.user)
+        online_users[socket.user.id] = socket.user
+        console.log(online_users)
 
         //----page----
-        socket.emit("active_users", online_users.map(u => { return u.name })) //skicka enbart användarnamnen
+        socket.emit("active_users", Object.values(online_users).map(a => a.name)) //skicka enbart användarnamnen
+        // console.log(Object.values(online_users).map(a => a.name));
+        
         //console.log("------online_users------")
         //console.log(online_users)
         socket.broadcast.emit("user_connected", socket.user.name)
@@ -246,12 +275,17 @@ io.on('connection', (socket) => {
     }
 
     socket.on('disconnect', (reason) => {
-        online_users.splice(online_users.indexOf(socket.user), 1)
-        console.log('a user disconnected because of ' + reason)
-        console.log("------online_users------")
-        console.log(online_users)
-        io.emit("active_users", online_users.map(u => { return u.name }))
-        io.emit("remove_character", socket.user)
+        // online_users.splice(online_users.indexOf(socket.user), 1)
+        if (socket.user) {
+            console.log('disconnect ');
+            console.log(socket.user);
+            delete online_users[socket.user.id]
+            console.log('a user disconnected because of ' + reason)
+            console.log("------online_users------")
+            console.log(online_users)
+            // io.emit("active_users", online_users.map(u => { return u.name }))
+            io.emit("remove_character", socket.user)
+        }
     })
 
     socket.on("pong", () => {
@@ -276,7 +310,14 @@ io.on('connection', (socket) => {
     })
 
     socket.on('item taken', (screen_nr, item_index) => {
+        items[screen_nr].splice(item_index, 1)
         socket.broadcast.emit('item taken', screen_nr, item_index)
+    })
+
+    socket.on('item thrown', (screen_nr, item) => {
+        socket.broadcast.emit('item thrown', screen_nr, item);
+        ['color', 'stack_size'].forEach(k => delete item[k])
+        items[screen_nr].push(item)
     })
 })
 

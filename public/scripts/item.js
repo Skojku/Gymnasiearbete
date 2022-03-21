@@ -24,4 +24,8 @@ class Item extends Collision_base{
         ctx.fillStyle = this.color
         ctx.fillRect(this.x, this.y, this.width, this.height)
     }
+
+    static objToItem(obj) {
+        return new Item(obj.height, obj.width, obj.x, obj.y, obj.itemtype)
+    }
 }
