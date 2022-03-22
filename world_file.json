@@ -11,27 +11,6 @@
             {
                 "height": 50,
                 "width": 50,
-                "x": 100,
-                "y": 200,
-                "type": "bush"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 200,
-                "y": 200,
-                "type": "bush"
-            },
-            {
-                "height": 50,
-                "width": 50,
-                "x": 200,
-                "y": 150,
-                "type": "bush"
-            },
-            {
-                "height": 50,
-                "width": 50,
                 "x": 300,
                 "y": 200,
                 "type": "bush"
@@ -120,35 +99,45 @@
                 "width": 20,
                 "x": 100,
                 "y": 50,
-                "itemtype": "rock"
+                "itemtype": "rock",
+                "color": "#727080",
+                "stack_size": 3
             },
             {
                 "height": 20,
                 "width": 20,
                 "x": 200,
                 "y": 50,
-                "itemtype": "rock"
+                "itemtype": "rock",
+                "color": "#727080",
+                "stack_size": 3
             },
             {
                 "height": 20,
                 "width": 20,
                 "x": 100,
                 "y": 100,
-                "itemtype": "rock"
+                "itemtype": "rock",
+                "color": "#727080",
+                "stack_size": 3
             },
             {
                 "height": 20,
                 "width": 20,
                 "x": 200,
                 "y": 100,
-                "itemtype": "rock"
+                "itemtype": "rock",
+                "color": "#727080",
+                "stack_size": 3
             },
             {
                 "height": 20,
                 "width": 20,
                 "x": 300,
                 "y": 100,
-                "itemtype": "brick"
+                "itemtype": "brick",
+                "color": "#f2a922",
+                "stack_size": 3
             }
         ],
         "characters": [],

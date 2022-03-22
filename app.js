@@ -4,7 +4,7 @@ const http = require('http')
 const server = http.createServer(app)
 const { Server } = require('socket.io')
 const io = new Server(server)
-const session = require('express-session')
+// const session = require('express-session')
 const db_handler = require('./db_handler')
 const md5 = require('md5')
 
@@ -20,20 +20,27 @@ var items = {}
 //x BÄTTRE COLLISION
 //x fixa sprites
 //x fixa att man inte kan logga in som samma karaktär
-// fixa f5 --
-// databas --fixa delete funktionalitet
+//x fixa f5 --
 // lägg till items i editor
+// databas --fixa delete funktionalitet
 
-var req1
+// var req1
 
 app.use(express.static('./public'))
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
-app.use(session({
+/* app.use(session({
     secret: randomBytes(4).toString('hex'),
     resave: true,
-    saveUninitialized: false
-}))
+    saveUninitialized: true
+})) */
+var session = require('express-session')({
+    secret: randomBytes(4).toString('hex'),
+    resave: true,
+    saveUninitialized: true
+})
+var sharedsession = require('express-socket.io-session')
+app.use(session)
 
 //spara items på servern istället för hos klienten
 fs.readFile('world_file.json', (err, data) => {
@@ -57,6 +64,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/game', (req, res) => {
+    console.log('game');
     if (req.session.loggedIn) {
         res.sendFile(__dirname + '/public/html/index.html')
     } else {
@@ -136,7 +144,7 @@ app.get('/create_user', (req, res) => {
 app.post('/logout', (req, res) => {
     console.log('logout------------------------');
     req.session.destroy()
-    req1 = null
+    // req1 = null
     res.send()
     //res.redirect('/')
 })
@@ -144,8 +152,9 @@ app.post('/logout', (req, res) => {
 app.put('/update_user', (req, res) => {
     console.log('update_user------------------------')
     let update = req.body
+    Object.assign(req.session.user, update)
     update.id = req.session.user.id
-    //console.log(update);
+    // console.log(update);
     db_handler.update_user(update)
         .then(response => {
             console.log(response)
@@ -159,7 +168,7 @@ app.put('/update_user', (req, res) => {
 })
 
 app.post('/login', (req, res) => {
-    req1 = req
+    // req1 = req
     const loginuser = req.body
     if (!loginuser.username || !loginuser.password) {
         console.log('login unsuccessful')
@@ -177,7 +186,7 @@ app.post('/login', (req, res) => {
                         if (loginuser.editor === "on") {
                             res.redirect('/editor')
                         } else {
-                            req1.session.user = {
+                            req.session.user = {
                                 id: u.id,
                                 name: u.name,
                                 screen: u.screen,
@@ -189,9 +198,9 @@ app.post('/login', (req, res) => {
                                 .then(respons => {
                                     // console.log('inventory');
                                     // console.log(respons);
-                                    req1.session.user.inventory = {}
+                                    req.session.user.inventory = {}
                                     respons.forEach(i => {
-                                        req1.session.user.inventory[i["itemtype"]] = i["count"]
+                                        req.session.user.inventory[i["itemtype"]] = i["count"]
                                     })
                                     // console.log('user');
                                     // console.log(req1.session.user.inventory);
@@ -221,7 +230,6 @@ app.post('/login', (req, res) => {
             res.redirect('/')
             console.log(error);
         })
-
 })
 
 app.post('/create_user', (req, res) => {
@@ -241,22 +249,29 @@ app.post('/create_user', (req, res) => {
 
 // -----------socket shit------------
 
+io.use(sharedsession(session, {
+    autoSave:false
+}))
+
 io.on('connection', (socket) => {
-    if (req1) {
-        socket.user = req1.session.user
-        //(socket.user);
+    if (socket.handshake.session.user) {
+        // socket.user = req1.session.user
+        console.log('hejsan');
+        console.log(socket.handshake.session.user);
+        socket.user = socket.handshake.session.user
+
         console.log('a user connected')
         // online_users.push(socket.user)
         online_users[socket.user.id] = socket.user
-        console.log(online_users)
+        // console.log(online_users)
 
         //----page----
-        socket.emit("active_users", Object.values(online_users).map(a => a.name)) //skicka enbart användarnamnen
+        io.emit("active_users", Object.values(online_users).map(a => a.name)) //skicka enbart användarnamnen
         // console.log(Object.values(online_users).map(a => a.name));
         
-        //console.log("------online_users------")
-        //console.log(online_users)
-        socket.broadcast.emit("user_connected", socket.user.name)
+        console.log("------online_users------ connect")
+        console.log(online_users)
+        // socket.broadcast.emit("user_connected", socket.user.name)
 
         //----game----
         console.log('clientsCount = ' + io.engine.clientsCount)
@@ -277,13 +292,12 @@ io.on('connection', (socket) => {
     socket.on('disconnect', (reason) => {
         // online_users.splice(online_users.indexOf(socket.user), 1)
         if (socket.user) {
-            console.log('disconnect ');
-            console.log(socket.user);
+            // console.log(socket.user);
             delete online_users[socket.user.id]
             console.log('a user disconnected because of ' + reason)
-            console.log("------online_users------")
+            console.log("------online_users------ disconnect")
             console.log(online_users)
-            // io.emit("active_users", online_users.map(u => { return u.name }))
+            io.emit("active_users", Object.values(online_users).map(a => a.name))
             io.emit("remove_character", socket.user)
         }
     })

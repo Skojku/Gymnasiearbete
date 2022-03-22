@@ -60,11 +60,11 @@ function page() {
         printUsers()
     })
 
-    socket.on("user_connected", (user) => {
+    /* socket.on("user_connected", (user) => {
         console.log("user_connected")
         active_users.push(user)
         printUsers()
-    })
+    }) */
 
     socket.on('server_restart', () => {
         socket.disconnect()
@@ -74,7 +74,7 @@ function page() {
 
     function printUsers() {
         $("#users").empty()
-        // console.log(username)
+        // console.log(active_users)
         active_users.forEach(user => {
             $("#users").append(`<li>${user}</li>`)
         })

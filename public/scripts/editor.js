@@ -67,6 +67,10 @@ $(() => {
         selected_item = $("#select_obstacle").val()
     })
 
+    $("#select_item").change(() => {
+        selected_item = $("#select_obstacle").val()
+    })
+
     $("#edit_screen").change(() => {
         /* console.log('---------------')
         console.log(screens[0].obstacles) */
