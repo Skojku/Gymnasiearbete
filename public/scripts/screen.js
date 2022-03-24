@@ -37,6 +37,14 @@ class Screen {
         })
     }
 
+    addItem(i) {
+        this.items.push(i)
+    }
+
+    removeItems() {
+        this.items = []
+    }
+
     addObstacle(o) {
         this.obstacles.push(o)
     }

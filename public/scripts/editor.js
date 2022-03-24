@@ -3,7 +3,8 @@ $(() => {
     canvas.width = 500
 
     var screen = new Screen(0, [-1, -1, -1, -1], false)
-    var selected_item = $("#select_obstacle").val()
+    var selected_obstacle = $("#select_obstacle").val()
+    var selected_item = $("#select_item").val()
     var screens = []
 
     get_world_file()
@@ -16,6 +17,7 @@ $(() => {
             $("#edit_screen").empty()
             $("#edit_screen").append('<option value="first" selected>Choose screen to edit</option>')
             data.forEach(s => {
+                console.log(s);
                 screens.push(Screen.from(s))
                 $("#edit_screen").append(`<option value="${s.number}">${s.number}</option>`)
             })
@@ -49,10 +51,7 @@ $(() => {
         let j = Math.floor(y / 50)
         //console.log(i + " , " + j)
 
-        if (selected_item !== "erase") {
-            screen.addObstacle(new Obstacle(50, 50, i * 50, j * 50, selected_item))
-            redraw_canvas()
-        } else {
+        if ($("#erase").is(":checked")) {
             screen.obstacles.forEach((o, a) => {
                 if (o.x === i * 50 && o.y === j * 50) {
                     console.log(a)
@@ -60,15 +59,50 @@ $(() => {
                     redraw_canvas()
                 }
             })
+            console.log(screen.items);
+            screen.items.forEach((o, a) => {
+                if (o.x === i * 50 + 15 && o.y === j * 50 + 15) {
+                    screen.items.splice(a, 1)
+                    redraw_canvas()
+                }
+            })
+        }
+        else if (selected_obstacle !== "choose") {
+            screen.addObstacle(new Obstacle(50, 50, i * 50, j * 50, selected_obstacle))
+            redraw_canvas()
+        } else if (selected_item !== "choose") {
+            screen.addItem(new Item(20, 20, i * 50 + 15, j * 50 + 15, selected_item))
+            redraw_canvas()
         }
     })
 
+    $("#erase").click(() => {
+        console.log($("#erase").is(":checked"))
+
+        $("#select_item").val("choose")
+        selected_item = "choose"
+        $("#select_obstacle").val("choose")
+        selected_obstacle = "choose"
+    })
+
     $("#select_obstacle").change(() => {
-        selected_item = $("#select_obstacle").val()
+        selected_obstacle = $("#select_obstacle").val()
+        if ($("#select_obstacle").val() !== "choose") {
+            $("#select_item").val("choose");
+            selected_item = "choose"
+            $("#erase").prop('checked', false)
+        }
+        console.log('item= ' + $("#select_item").val() + ". obstacle= " + $("#select_obstacle").val());
     })
 
     $("#select_item").change(() => {
-        selected_item = $("#select_obstacle").val()
+        selected_item = $("#select_item").val()
+        if ($("#select_item").val() !== "choose") {
+            $("#select_obstacle").val("choose");
+            selected_obstacle = "choose"
+            $("#erase").prop('checked', false)
+        }
+        console.log('item= ' + $("#select_item").val() + ". obstacle= " + $("#select_obstacle").val());
     })
 
     $("#edit_screen").change(() => {
@@ -86,13 +120,14 @@ $(() => {
             redraw_canvas()
         } else {
             screen.removeObstacles()
+            screen.removeItems()
             clear_settings()
             redraw_canvas()
         }
     })
 
     $("#submit").click(() => {
-        console.log('klick')
+        console.log('submitwa')
         screen.number = parseInt($("#number").val())
         screen.nextScreens = [parseInt($("#next1").val()), parseInt($("#next2").val()), parseInt($("#next3").val()), parseInt($("#next4").val())]
         screen.addBorders()
@@ -117,6 +152,7 @@ $(() => {
             dataType: "json"
         })
         screen.removeObstacles()
+        screen.removeItems()
         clear_settings()
         redraw_canvas()
         get_world_file()
@@ -125,12 +161,14 @@ $(() => {
     //clear canvas
     $("#clearC").click(() => {
         screen.removeObstacles()
+        screen.removeItems()
         redraw_canvas()
     })
 
     //clear everything
     $("#clearE").click(() => {
         screen.removeObstacles()
+        screen.removeItems()
         clear_settings()
         redraw_canvas()
     })

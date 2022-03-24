@@ -4,7 +4,6 @@ const http = require('http')
 const server = http.createServer(app)
 const { Server } = require('socket.io')
 const io = new Server(server)
-// const session = require('express-session')
 const db_handler = require('./db_handler')
 const md5 = require('md5')
 
@@ -25,15 +24,6 @@ var items = {}
 // databas --fixa delete funktionalitet
 
 // var req1
-
-app.use(express.static('./public'))
-app.use(express.urlencoded({ extended: false }))
-app.use(express.json())
-/* app.use(session({
-    secret: randomBytes(4).toString('hex'),
-    resave: true,
-    saveUninitialized: true
-})) */
 var session = require('express-session')({
     secret: randomBytes(4).toString('hex'),
     resave: true,
@@ -41,6 +31,10 @@ var session = require('express-session')({
 })
 var sharedsession = require('express-socket.io-session')
 app.use(session)
+
+app.use(express.static('./public'))
+app.use(express.urlencoded({ extended: false }))
+app.use(express.json())
 
 //spara items på servern istället för hos klienten
 fs.readFile('world_file.json', (err, data) => {
