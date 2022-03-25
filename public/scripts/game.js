@@ -20,6 +20,7 @@ function game() {
         s: false
     }
     let promise_getWorld = new Promise((resolve, reject) => {
+        console.log('getworld');
         $.get("/world_file", (data) => {
             console.log(data);
             data.forEach(s => {
@@ -360,8 +361,7 @@ function game() {
                     alert('Choose an item to throw (click inventory)')
                 }
             }
-        
-        
+            
             $(window).keydown((e) => {
                 let key = e.which
                 // console.log(key)

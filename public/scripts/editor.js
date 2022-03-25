@@ -127,7 +127,7 @@ $(() => {
     })
 
     $("#submit").click(() => {
-        console.log('submitwa')
+        console.log('submit')
         screen.number = parseInt($("#number").val())
         screen.nextScreens = [parseInt($("#next1").val()), parseInt($("#next2").val()), parseInt($("#next3").val()), parseInt($("#next4").val())]
         screen.addBorders()

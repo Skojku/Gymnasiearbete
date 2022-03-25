@@ -84,16 +84,22 @@ app.get('/world_file', (req, res) => {
     })
 })
 
+
+app.post('/update_world', (req, res) => {
+    console.log(req.body);
+    items = {}
+    req.body.forEach(s => {
+        items[s.number] = s.items
+    })
+    fs.writeFileSync("world_file.json", JSON.stringify(req.body, null, 4))
+})
+
 app.get('/editor', (req, res) => {
     if (req.session.loggedIn) {
         res.sendFile(__dirname + '/public/html/editor.html')
     } else {
         res.redirect('/')
     }
-})
-
-app.post('/update_world', (req, res) => {
-    fs.writeFileSync("world_file.json", JSON.stringify(req.body, null, 4))
 })
 
 app.get('/username', (req, res) => {
@@ -138,7 +144,6 @@ app.get('/create_user', (req, res) => {
 app.post('/logout', (req, res) => {
     console.log('logout------------------------');
     req.session.destroy()
-    // req1 = null
     res.send()
     //res.redirect('/')
 })
