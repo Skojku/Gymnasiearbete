@@ -1,5 +1,5 @@
 class Screen {
-    constructor(number, nextScreens, active) {
+    constructor(number, nextScreens, active) { 
         this.number = number
         this.nextScreens = nextScreens
         this.obstacles = []
@@ -8,6 +8,7 @@ class Screen {
         this.active = active
     }
 
+    // lägg till borders på alla sidor som inte leder till en annan skärm
     addBorders() {
         for (let i = 0; i < this.obstacles.length; i++) { //ta bort alla borders
             if (this.obstacles[i].type == "border") {
@@ -15,7 +16,7 @@ class Screen {
                 i--
             }
         }
-        this.nextScreens.forEach((n, i) => { //lägg till nya
+        this.nextScreens.forEach((n, i) => { //lägg till nya borders
             if (n === -1) {
                 switch (i) {
                     case 0:
@@ -37,22 +38,27 @@ class Screen {
         })
     }
 
+    // lägg till ett item
     addItem(i) {
         this.items.push(i)
     }
 
+    // ta bort alla items
     removeItems() {
         this.items = []
     }
 
+    // lägg till ett obstacle
     addObstacle(o) {
         this.obstacles.push(o)
     }
 
+    // lägg till en karaktär
     addCharacter(c) {
         this.characters.push(c)
     }
 
+    // ta bort alla obstacles som inte är borders
     removeObstacles() {
         this.obstacles.forEach(o => {
             if (o.type !== "border") {
@@ -61,6 +67,7 @@ class Screen {
         })
     }
 
+    // rita ut allt på skärmen
     draw() {
         this.obstacles.forEach((o) => {
             o.draw()
@@ -73,11 +80,9 @@ class Screen {
         })
     }
 
-    //läs från json-fil
+    //läs från json-fil och skapa en ny skärm
     static from(json) {
-        //console.log(json);
         let s = new Screen(json.number, json.nextScreens, json.active)
-        //console.log(json.obstacles);
         json.obstacles.forEach(o => {
             s.obstacles.push(new Obstacle(o.width, o.height, o.x, o.y, o.type))
         })
@@ -85,8 +90,6 @@ class Screen {
             s.items.push(new Item(i.width, i.height, i.x, i.y, i.itemtype))
         })
         s.characters = []
-        //console.log('sssssssssss');
-        //console.log(s);
         return s
     }
 }

@@ -20,11 +20,13 @@ class Item extends Collision_base{
         }
     }
 
+    // rita ut itemet i canvasen
     draw() {
         ctx.fillStyle = this.color
         ctx.fillRect(this.x, this.y, this.width, this.height)
     }
 
+    // skapa ett item från ett vanligt javascript-objekt
     static objToItem(obj) {
         return new Item(obj.height, obj.width, obj.x, obj.y, obj.itemtype)
     }

@@ -1,12 +1,9 @@
-const express = require('express')
-const router = express.Router()
 const sqlite3 = require('sqlite3').verbose()
 const md5 = require('md5')
 
 const DBSOURCE = "db2.sqlite"
 
-router.use(express.urlencoded({ extended: false }))
-
+// skapa en sqlitedatabas
 let db = new sqlite3.Database(DBSOURCE, (err) => {
     if (err) {
         // Cannot open database
@@ -15,7 +12,8 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
     } else {
         console.log('Connected to the SQLite database.')
     }
-});
+})
+
 
 async function get_inventory_by_userid(id) {
     var sql = 'SELECT itemtype, count FROM user JOIN hasitem ON user.id = hasitem.playerid WHERE user.id = ?'

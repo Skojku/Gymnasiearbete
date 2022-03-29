@@ -48,14 +48,14 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        //globala variabler
+        //------globala variabler------
         const canvas = document.getElementById("canvas")
         const ctx = canvas.getContext("2d")
         const playersheet = new Image()
         playersheet.src = '../images/playersheet.png'
-        const playersheet_pos = {
+        const playersheet_pos = { // visa var varje sprite i spritesheeten är
             standing: {
-                s: [2, 3, 18, 23],
+                s: [2, 3, 18, 23], // 1:a pos = x, 2:a pos = y, 3:e pos = width, 4:e pos = height
                 a: [3, 30, 18, 22],
                 w: [3, 57, 18, 21],
                 d: [3, 82, 17, 22]
@@ -111,26 +111,11 @@
                 }
             }
         }
-        //var username
         var player
         var screen
         var socket = io()
         page()
         game()
-        /*let promise = new Promise((resolve) => {
-            $.get("/username", (u) => {
-                resolve(u)
-                //console.log(u + " 1")
-            })
-        })
-        promise.then((value) => {
-            //console.log('then')
-            username = value
-            //console.log(username + " 2")
-            socket = io()
-            page()
-            game()
-        })*/
     </script>
 </body>
 
