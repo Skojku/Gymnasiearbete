@@ -1,6 +1,7 @@
 function page() {
     var active_users = []
-
+    
+    // uppdatera usern i databasen samt logga ut
     $("#logout").click(() => {
         console.log(player);
         let data = {
@@ -26,6 +27,7 @@ function page() {
         })
     })
 
+    // uppdaterar usern
     socket.on('update_user', () => {
         let data = {
             screen: screen.number,
@@ -53,25 +55,22 @@ function page() {
         socket.emit('pong')
     })
 
+    // printar alla users som är online till skärmen
     socket.on("active_users", (users) => {
-        //console.log('active users')
+        // console.log('active users')
         active_users = users
-        console.log(active_users);
+        // console.log(active_users);
         printUsers()
     })
 
-    /* socket.on("user_connected", (user) => {
-        console.log("user_connected")
-        active_users.push(user)
-        printUsers()
-    }) */
-
+    // vid en restart av servern, logga ut usern
     socket.on('server_restart', () => {
         socket.disconnect()
         $.post("/logout")
         window.location.replace('/')
     })
 
+    // printar prinar alla aktiva users i ett html-element
     function printUsers() {
         $("#users").empty()
         // console.log(active_users)
