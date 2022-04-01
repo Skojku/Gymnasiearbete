@@ -1,10 +1,11 @@
 function game() {
-    var speed = 200
+    var speed = 200 
     canvas.height = 500
     canvas.width = 500
 
     var screens = []
 
+    // objekt som håller koll på vilka tangenter som är nedtryckta
     var keys = {
         up: false,
         down: false,
@@ -13,25 +14,29 @@ function game() {
         item: false
     }
 
+    // objekt som håller koll på åt vilket håll spelaren går åt
     var dirs = {
         a: false,
         d: false,
         w: false,
         s: false
     }
+    
+    // skapar en promise som väntar på att världen laddas innan något annat händer
     let promise_getWorld = new Promise((resolve, reject) => {
-        console.log('getworld');
+        // console.log('getworld');
         $.get("/world_file", (data) => {
-            console.log(data);
+            // console.log(data);
             data.forEach(s => {
                 screens.push(Screen.from(s))
             })
-            //console.log('---------------------');
-            //console.log(screens)
+            // console.log('---------------------');
+            // console.log(screens)
             resolve(screens)
         })
     }).then(() => {
-            socket.on('player', (user, characters2) => { //kolla på det här sen
+            // skapar spelaren samt alla andra karaktärer som är online
+            socket.on('player', (user, characters2) => { 
                 screens.forEach((s1) => {
                     if (s1.number === user.screen) {
                         s1.active = true
@@ -39,7 +44,7 @@ function game() {
                         //console.log("screen: " + screen.number);
                     }
                 })
-                //console.log(characters2);
+                
                 characters2.forEach(c => {
                     if (user.id === c.id) {
                         player = new Character(user.x, user.y, 'green', user.name)
@@ -54,16 +59,19 @@ function game() {
                 })
             })
         
+            // skapar en karaktär som precis joinade
             socket.on('new_character', (user) => {
                 //screens.find((s1) => { return s1.number === s }).characters.push(new Character(x, y, 'green', name))
                 screens[user.screen].characters.push(new Character(user.x, user.y, 'blue', user.name))
             })
         
+            // tar bort en karaktär från spelet, om den disconnectade
             socket.on('remove_character', (user) => {
                 screens[user.screen].characters.splice(screens[user.screen].characters.indexOf(screens[user.screen].characters.find((c) => { return c.name === user.name })), 1)
             })
         
-            socket.on('position', (user, dir, walking) => { //ändra andras position
+            // uppdaterar en viss users position
+            socket.on('position', (user, dir, walking) => { 
                 //console.log(screens[user.screen]);
                 let characters = screens[user.screen].characters
                 for (let i = 0; i < characters.length; i++) {
@@ -75,6 +83,7 @@ function game() {
                 }
             })
         
+            // uppdaterar en users sprite så att den står stilla
             socket.on('player_standing', (user) => {
                 console.log(user.screen);
                 screens[user.screen].characters.forEach(c => {
@@ -84,9 +93,10 @@ function game() {
                 })
             })
         
+            // uppdaterar en users skärm vid skärmbyte
             socket.on('change_screen', (s, newS, u) => {
                 let user;
-                screens.forEach(s1 => {
+                screens.forEach(s1 => { // tar bort usern från första skärmen
                     if (s1.number === s) {
                         user = s1.characters.splice(s1.characters.indexOf(s1.characters.find((u1) => { return u1.username === u })), 1)[0]
                         //console.log("-----------------");
@@ -94,7 +104,7 @@ function game() {
                         //console.log(s1.characters);
                     }
                 })
-                screens.forEach(s1 => {
+                screens.forEach(s1 => { // lägger till usern i andra skärmen
                     if (s1.number === newS) {
                         //console.log('u: ' + u);
                         //console.log(user.username + " -----------");
@@ -103,8 +113,9 @@ function game() {
                 })
             })
         
+            // tar bort ett item från världen när någon plockar upp det
             socket.on('item taken', (screen_nr, item_index) => {
-                console.log('item taken');
+                // console.log('item taken');
                 screens.forEach(s => {
                     if (s.number === screen_nr) {
                         s.items.splice(item_index, 1)
@@ -112,9 +123,10 @@ function game() {
                 })
             })
         
+            // lägger till ett item i världen när någon kastar ut det
             socket.on('item thrown', (screen_nr, item) => {
-                console.log('item thrown');
-                console.log(item);
+                // console.log('item thrown');
+                // console.log(item);
                 screens.forEach(s => {
                     if (s.number === screen_nr) {
                         s.items.push(Item.objToItem(item))
@@ -124,7 +136,7 @@ function game() {
         
             let previous_timestamp
             let counter = 0 //counter för att veta när man ska ändra animationssteg
-            function game_loop(timestamp) {
+            function game_loop(timestamp) { // gameloopen som kontinuerligt körs när man är i spelet
                 window.requestAnimationFrame(game_loop)
                 if (!previous_timestamp) {
                     previous_timestamp = timestamp
@@ -133,7 +145,7 @@ function game() {
                 previous_timestamp = timestamp
         
                 ctx.clearRect(0, 0, canvas.width, canvas.height) //clear canvas
-                if (player) { //om player är loadad
+                if (player) { //om player är laddad 
                     let dx = 0
                     let dy = 0
                     let moving = false
@@ -167,13 +179,13 @@ function game() {
                         console.log('kasta');
                     }
                     if (moving) {
-                        if (counter === 5) {
+                        if (counter === 5) { // om det har gått 5 loops i gameloopen när man går, ändra spelarens sprite
                             counter = 0
                             player.walk()
                         } else {
                             counter++
                         }
-                        if (isCollide(player, screen.obstacles, dx, dy) !== -1) {
+                        if (isCollide(player, screen.obstacles, dx, dy) !== -1) { // checkar om man kolliderar med något
                             if (dx > 0 && isCollide(player, screen.obstacles, dx, 0) !== -1) {
                                 moveToObstacle(screen.obstacles[isCollide(player, screen.obstacles, dx, 0)], 'right')
                             } else if (dx < 0 && isCollide(player, screen.obstacles, dx, 0) !== -1) {
@@ -188,15 +200,9 @@ function game() {
                         else {
                             player.move(dx, dy)
                         }
-                        socket.emit('position', [player.x, player.y], player.dir, player.walking)
+                        socket.emit('position', [player.x, player.y], player.dir, player.walking) // emitar spelarens position till alla andra klienter
                     }
                     checkIfNewScreen()
-                    $("#screen_nr").html("Screen: " + screen.number);
-                    $("#player_x").html("Player_x: " + player.x);
-                    $("#player_y").html("Player_y: " + player.y);
-                    $("#obstacle_x").html("obstacle[0]_x: " + screen.obstacles[0].x);
-                    $("#obstacle_y").html("obstacle[0]_y: " + screen.obstacles[0].y);
-                    //console.log(player.x);
                     screen.draw()
                     player.draw()
         
@@ -205,6 +211,7 @@ function game() {
         
             window.requestAnimationFrame(game_loop)
         
+            // checkar om spelaren kolliderar med något
             function isCollide(player, obstacles, dx, dy) {
                 let newX = player.x + dx
                 let newY = player.y + dy
@@ -220,6 +227,7 @@ function game() {
                 return isColliding
             }
         
+            // flyttar spelaren precis brevid det man kolliderade med
             function moveToObstacle(obstacle, dir) {
                 switch (dir) { //spelaren går:
                     case "up": // upp
@@ -239,6 +247,7 @@ function game() {
                 }
             }
         
+            // checkar om man genomför ett skärmbyte
             function checkIfNewScreen() {
                 screen.nextScreens.forEach((n, i) => {
                     if (n != -1) {
@@ -274,9 +283,8 @@ function game() {
                         }
                         if (change) {
                             screen.active = false
-                            //console.log('n: ' + n);
                             let newScreen = screens.find((s) => { return s.number === n })
-                            socket.emit("change_screen", screen.number, newScreen.number)
+                            socket.emit("change_screen", screen.number, newScreen.number) // emitar till alla andra klienter att man genomför ett skärmbyte
                             screens[screens.indexOf(newScreen)].active = true
                             screen = getActiveScreen()
                         }
@@ -284,10 +292,12 @@ function game() {
                 })
             }
         
+            // returnerar den aktiva skärmen
             function getActiveScreen() {
                 return screens.find((screen) => { return screen.active === true })
             }
         
+            // uppdaterar html-elementet där inventoryt visas
             function updateInventoryHTML(markedItemType) {
                 $("#inventory").empty()
                 for (const itemtype in player.inventory) {
@@ -315,6 +325,7 @@ function game() {
                 return string.charAt(0).toUpperCase() + string.slice(1);
             }
         
+            // checkar åt vilket håll man går åt
             function checkDir() {
                 for (const dir in dirs) {
                     if (dirs[dir]) {
@@ -323,6 +334,7 @@ function game() {
                 }
             }
         
+            // checkar om man står stilla
             function checkIfStanding() {
                 let moving = false
                 for (const key in keys) {
@@ -337,6 +349,7 @@ function game() {
                 }
             }
         
+            // kastar ut ett item som är markerat i inventory-menyn
             function throwItem() {
                 let type
                 $("ul#inventory li").each(function () {
@@ -388,7 +401,7 @@ function game() {
                         break
                     case 32: //space
                         e.preventDefault()
-                        console.log("space")
+                        // console.log("space")
                         break
                     case 70: //f
                         keys.item = true
