@@ -14,11 +14,12 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
     }
 })
 
-
+// returnerar en users inventory från databasen
 async function get_inventory_by_userid(id) {
     var sql = 'SELECT itemtype, count FROM user JOIN hasitem ON user.id = hasitem.playerid WHERE user.id = ?'
     var params = [id]
 
+    // skapar en promise som väntar på databasen, samma för alla andra promises i denna fil
     let myPromise = new Promise((resolve, reject) => {
         db.all(sql, params, (err, rows) => {
             if (err) {
@@ -30,6 +31,7 @@ async function get_inventory_by_userid(id) {
     return await myPromise
 }
 
+// returnerar usern med samma id som skickas in som argument
 async function get_user_by_id(id) {
     var sql = 'SELECT name, screen, x, y FROM user WHERE id = ?'
     var params = [id]
@@ -45,6 +47,7 @@ async function get_user_by_id(id) {
     return await myPromise
 }
 
+// returnerar alla users i databasen
 async function get_all_users() {
     var sql = "SELECT * FROM user"
     var params = []
@@ -61,6 +64,7 @@ async function get_all_users() {
     return await myPromise
 }
 
+// skapar en user med användarnamn och lösenord från create_user.html
 async function create_user(username, password, password2) {
     let myPromise = new Promise((resolve, reject) => {
         var errors = []
@@ -97,8 +101,8 @@ async function create_user(username, password, password2) {
     return await myPromise
 }
 
+// uppdaterar en user i databasen
 async function update_user(user) {
-    // console.log(user);
     var sql_user = 'UPDATE user SET x = ?, y = ?, screen = ? WHERE id = ?' 
     var sql_inventory = 'INSERT INTO hasitem (playerid, itemtype, count) VALUES (?, ?, ?)'
     let myPromise = new Promise((resolve, reject) => {
@@ -125,6 +129,7 @@ async function update_user(user) {
     return await myPromise
 }
 
+// checkar om en user finns i databasen, resolve om usern finns annars reject
 async function user_in_db(user) {
     let myPromise = new Promise((resolve, reject) => {
         get_all_users()
@@ -141,4 +146,5 @@ async function user_in_db(user) {
     return await myPromise
 }
 
+// exportar alla funktioner som behövs kunna användas i resten av servern
 module.exports = { get_all_users, create_user, update_user, get_user_by_id, get_inventory_by_userid }
