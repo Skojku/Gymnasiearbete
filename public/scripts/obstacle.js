@@ -4,6 +4,7 @@ class Obstacle extends Collision_base {
         this.type = type
     }
 
+    // ritar ut obstaclen
     draw() {
         if (this.type == "bush") {
             ctx.fillStyle = '#047015'
@@ -17,6 +18,7 @@ class Obstacle extends Collision_base {
         ctx.fillRect(this.x,this.y,this.width,this.height)
     }
 
+    // skapar en obstacle från ett json-objekt
     createObstacle(json) {
         this.height = json.height
         this.width = json.width
