@@ -79,6 +79,41 @@
                 "type": "bush"
             },
             {
+                "height": 50,
+                "width": 50,
+                "x": 250,
+                "y": 200,
+                "type": "bush"
+            },
+            {
+                "height": 50,
+                "width": 50,
+                "x": 200,
+                "y": 200,
+                "type": "bush"
+            },
+            {
+                "height": 50,
+                "width": 50,
+                "x": 150,
+                "y": 200,
+                "type": "bush"
+            },
+            {
+                "height": 50,
+                "width": 50,
+                "x": 100,
+                "y": 200,
+                "type": "bush"
+            },
+            {
+                "height": 50,
+                "width": 50,
+                "x": 50,
+                "y": 200,
+                "type": "bush"
+            },
+            {
                 "height": 500,
                 "width": 5,
                 "x": 500,
@@ -97,8 +132,8 @@
             {
                 "height": 20,
                 "width": 20,
-                "x": 100,
-                "y": 50,
+                "x": 303.51640000000054,
+                "y": 60.17200000000014,
                 "itemtype": "rock",
                 "color": "#727080",
                 "stack_size": 3
@@ -106,8 +141,26 @@
             {
                 "height": 20,
                 "width": 20,
-                "x": 200,
-                "y": 50,
+                "x": 13.232200000001555,
+                "y": 246.97739999999914,
+                "itemtype": "torch",
+                "color": "#e6e643",
+                "stack_size": 2
+            },
+            {
+                "height": 20,
+                "width": 20,
+                "x": 99.96339999999984,
+                "y": 156.67759999999987,
+                "itemtype": "torch",
+                "color": "#e6e643",
+                "stack_size": 2
+            },
+            {
+                "height": 20,
+                "width": 20,
+                "x": 250.0828000000001,
+                "y": 79.9665999999998,
                 "itemtype": "rock",
                 "color": "#727080",
                 "stack_size": 3
@@ -115,17 +168,8 @@
             {
                 "height": 20,
                 "width": 20,
-                "x": 100,
-                "y": 100,
-                "itemtype": "rock",
-                "color": "#727080",
-                "stack_size": 3
-            },
-            {
-                "height": 20,
-                "width": 20,
-                "x": 200,
-                "y": 100,
+                "x": 81.37920000001365,
+                "y": 173.5309999999939,
                 "itemtype": "rock",
                 "color": "#727080",
                 "stack_size": 3
@@ -822,24 +866,6 @@
             }
         ],
         "items": [
-            {
-                "height": 20,
-                "width": 20,
-                "x": 65,
-                "y": 315,
-                "itemtype": "torch",
-                "color": "#e6e643",
-                "stack_size": 2
-            },
-            {
-                "height": 20,
-                "width": 20,
-                "x": 65,
-                "y": 315,
-                "itemtype": "torch",
-                "color": "#e6e643",
-                "stack_size": 2
-            },
             {
                 "height": 20,
                 "width": 20,
